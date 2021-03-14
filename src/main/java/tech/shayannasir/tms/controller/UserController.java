@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import tech.shayannasir.tms.constants.Constants;
 import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.LoginRequestDTO;
 import tech.shayannasir.tms.dto.LoginResponseDTO;
@@ -73,6 +74,14 @@ public class UserController {
     @PostMapping("/update")
     public ResponseDTO updateUser(@RequestBody UserDTO userDTO) {
         return userService.editUserDetails(userDTO);
+    }
+
+    @PostMapping("/logout")
+    public ResponseDTO logout(@RequestHeader(Constants.TOKEN_HEADER) String authHeader) {
+        if (StringUtils.isNotEmpty(authHeader)) {
+            return userService.logout(authHeader.substring(Constants.ESCAPE_BEARER));
+        }
+        return new ResponseDTO(false, messageService.getMessage(MessageConstants.INVALID_REQUEST));
     }
 
 }

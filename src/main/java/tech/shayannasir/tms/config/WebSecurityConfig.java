@@ -16,22 +16,40 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import springfox.documentation.builders.ParameterBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.ApiKeyVehicle;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import tech.shayannasir.tms.filter.JwtRequestFilter;
 import tech.shayannasir.tms.service.UserService;
+
+import java.util.Collections;
 
 import static tech.shayannasir.tms.enums.Role.*;
 
 @Configuration
 @EnableWebSecurity
+@EnableSwagger2
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
             new AntPathRequestMatcher("/noauth/**"),
+            new AntPathRequestMatcher("/hello"),
+
             new AntPathRequestMatcher("/user/login"),
+            new AntPathRequestMatcher("/user/create"),
+
+            /* Swagger routes */
             new AntPathRequestMatcher("/swagger-ui"),
             new AntPathRequestMatcher("/swagger-ui.html"),
-            new AntPathRequestMatcher("/hello"),
-            new AntPathRequestMatcher("/user/create")
+            new AntPathRequestMatcher("/swagger-resources/**"),
+            new AntPathRequestMatcher("/v2/api-docs"),
+            new AntPathRequestMatcher("/swagger-resources"),
+            new AntPathRequestMatcher("/webjars/**")
     );
 
     private static final RequestMatcher PROTECTED_URLS = new NegatedRequestMatcher(PUBLIC_URLS);
@@ -65,13 +83,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .requestMatchers(PUBLIC_URLS).permitAll()
 
-//                .antMatchers("/user/create")
-//                .hasAuthority(SUPER_ADMIN.name())
+
+                .antMatchers("/user/create")
+                .hasAuthority(SUPER_ADMIN.name())
 
                 // all other requests need to be authenticated
                 .anyRequest().authenticated().and()
-                // make sure we use stateless session; session won't be used to
-                // store user's state.
+
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -80,5 +98,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.cors();
     }
 
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2).select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any()).build().globalOperationParameters(
+                        Collections.singletonList(new ParameterBuilder()
+                                .name("Authorization")
+                                .description("Basic auth Token to pass for authorization")
+                                .modelRef(new ModelRef("string"))
+                                .parameterType(ApiKeyVehicle.HEADER.getValue())
+                                .required(false)
+                                .build()));
+    }
 
 }

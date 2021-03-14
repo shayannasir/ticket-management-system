@@ -9,7 +9,8 @@ import tech.shayannasir.tms.dto.UserDTO;
 public interface UserService extends UserDetailsService {
 
     ResponseDTO createUser(UserDTO userDTO);
-    String logout (String token);
+
+    ResponseDTO logout(String token);
 
     ResponseDTO<LoginResponseDTO> login(Authentication authentication);
 

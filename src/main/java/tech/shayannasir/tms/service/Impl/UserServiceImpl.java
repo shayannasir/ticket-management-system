@@ -171,8 +171,10 @@ public class UserServiceImpl extends MessageService implements UserService {
     }
 
     @Override
-    public String logout(String token) {
-        return null;
+    public ResponseDTO logout(String token) {
+        ResponseDTO responseDTO = new ResponseDTO(true, getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY));
+        jwtUtil.inValidateToken(token);
+        return responseDTO;
     }
 
     private void validateCreateUserRequest(UserDTO userDTO, ResponseDTO responseDTO) {
