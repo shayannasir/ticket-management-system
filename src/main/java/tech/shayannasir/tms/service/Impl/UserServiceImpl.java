@@ -1,7 +1,13 @@
 package tech.shayannasir.tms.service.Impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,10 +27,8 @@ import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.UserService;
 import tech.shayannasir.tms.util.JwtUtil;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.BooleanSupplier;
 
 @Slf4j
 @Service
@@ -55,7 +59,7 @@ public class UserServiceImpl extends MessageService implements UserService {
         validateCreateUserRequest(userDTO, responseDTO);
         if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
             responseDTO.setStatus(false);
-            responseDTO.setMessage(MessageConstants.INVALID_REQUEST);
+            responseDTO.setMessage(getMessage(MessageConstants.INVALID_REQUEST));
             return responseDTO;
         }
 
@@ -174,6 +178,51 @@ public class UserServiceImpl extends MessageService implements UserService {
     public ResponseDTO logout(String token) {
         ResponseDTO responseDTO = new ResponseDTO(true, getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY));
         jwtUtil.inValidateToken(token);
+        return responseDTO;
+    }
+
+    @Override
+    public DataTableResponseDTO<Object, List<UserDTO>> getListOfUsers(DataTableRequestDTO dataTableRequestDTO) {
+        List<UserDTO> userDTOS = new ArrayList<>();
+        List<User> userResults;
+        long resultCount;
+        Sort sort = null;
+        if (StringUtils.isNotBlank(dataTableRequestDTO.getSortColumn())) {
+            sort = Sort.by(dataTableRequestDTO.getSortDirection(), dataTableRequestDTO.getSortColumn());
+        }
+        if (BooleanUtils.isTrue(dataTableRequestDTO.getFetchAllRecords())) {
+            if (sort != null)
+                userResults = userRepository.findAll(sort);
+            else
+                userResults = userRepository.findAll();
+
+            resultCount = userResults.size();
+        } else {
+            Pageable pageable;
+            if (sort != null)
+                pageable = PageRequest.of(dataTableRequestDTO.getPageIndex(), dataTableRequestDTO.getPageSize(), sort);
+            else
+                pageable = PageRequest.of(dataTableRequestDTO.getPageIndex(), dataTableRequestDTO.getPageSize());
+
+            Page<User> userPage = userRepository.findAll(pageable);
+            userResults = userPage.getContent();
+            resultCount = userPage.getTotalElements();
+        }
+        userResults.stream().forEach(user -> {
+            UserDTO userDTO = UserDTO.builder()
+                    .name(user.getName())
+                    .id(user.getId())
+                    .phoneNumber(user.getPhoneNumber())
+                    .emailId(user.getEmail())
+                    .username(user.getUsername())
+                    .accountEnabled(user.getAccountEnabled())
+                    .createdDate(user.getCreatedDate())
+                    .build();
+            userDTOS.add(userDTO);
+        });
+
+        DataTableResponseDTO<Object, List<UserDTO>> responseDTO = DataTableResponseDTO.getInstance(userDTOS, resultCount);
+        responseDTO.setRecordsTotal(userRepository.count());
         return responseDTO;
     }
 

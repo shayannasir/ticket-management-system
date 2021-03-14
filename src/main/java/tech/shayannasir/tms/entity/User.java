@@ -18,11 +18,11 @@ import java.util.Date;
 @Entity
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class User implements UserDetails {
+public class User extends AuditEntity<Long> implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long Id;
+    Long id;
 
     String username;
 

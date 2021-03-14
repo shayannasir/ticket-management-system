@@ -15,12 +15,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import tech.shayannasir.tms.constants.Constants;
 import tech.shayannasir.tms.constants.MessageConstants;
-import tech.shayannasir.tms.dto.LoginRequestDTO;
-import tech.shayannasir.tms.dto.LoginResponseDTO;
-import tech.shayannasir.tms.dto.ResponseDTO;
-import tech.shayannasir.tms.dto.UserDTO;
+import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.UserService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -82,6 +81,13 @@ public class UserController {
             return userService.logout(authHeader.substring(Constants.ESCAPE_BEARER));
         }
         return new ResponseDTO(false, messageService.getMessage(MessageConstants.INVALID_REQUEST));
+    }
+
+    @PostMapping("/list")
+    public DataTableResponseDTO<Object, List<UserDTO>> getUserList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
+
+        return userService.getListOfUsers(dataTableRequestDTO);
+
     }
 
 }

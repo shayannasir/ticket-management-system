@@ -2,9 +2,9 @@ package tech.shayannasir.tms.service;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import tech.shayannasir.tms.dto.LoginResponseDTO;
-import tech.shayannasir.tms.dto.ResponseDTO;
-import tech.shayannasir.tms.dto.UserDTO;
+import tech.shayannasir.tms.dto.*;
+
+import java.util.List;
 
 public interface UserService extends UserDetailsService {
 
@@ -17,4 +17,6 @@ public interface UserService extends UserDetailsService {
     ResponseDTO getUserDetails(Long id);
 
     ResponseDTO editUserDetails(UserDTO userDTO);
+
+    DataTableResponseDTO<Object, List<UserDTO>> getListOfUsers(DataTableRequestDTO dataTableRequestDTO);
 }
