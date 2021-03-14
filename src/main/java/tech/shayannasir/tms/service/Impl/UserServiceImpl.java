@@ -3,6 +3,7 @@ package tech.shayannasir.tms.service.Impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,9 @@ import tech.shayannasir.tms.service.UserService;
 import tech.shayannasir.tms.util.JwtUtil;
 
 import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -47,7 +51,7 @@ public class UserServiceImpl extends MessageService implements UserService {
     @Override
     public ResponseDTO createUser(UserDTO userDTO) {
 
-        ResponseDTO responseDTO = new ResponseDTO(true, MessageConstants.USER_CREATED);
+        ResponseDTO responseDTO = new ResponseDTO(true, getMessage(MessageConstants.USER_CREATED));
         validateCreateUserRequest(userDTO, responseDTO);
         if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
             responseDTO.setStatus(false);
@@ -93,11 +97,6 @@ public class UserServiceImpl extends MessageService implements UserService {
     }
 
     @Override
-    public String logout(String token) {
-        return null;
-    }
-
-    @Override
     public ResponseDTO<LoginResponseDTO> login(Authentication authentication) {
         ResponseDTO<LoginResponseDTO> responseDTO = new ResponseDTO<>();
         User user = (User) loadUserByUsername(authentication.getName());
@@ -109,6 +108,71 @@ public class UserServiceImpl extends MessageService implements UserService {
         responseDTO.setStatus(true);
         responseDTO.setMessage(getMessage(MessageConstants.LOGIN_SUCCESS, user.getUsername()));
         return responseDTO;
+    }
+
+    @Override
+    public ResponseDTO getUserDetails(Long id) {
+        User tokenUser = getCurrentLoggedInUser();
+
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            if (tokenUser.getRole().toString().equals(Role.SUPER_ADMIN.name()) || tokenUser.getUsername().equals(optionalUser.get().getUsername())) {
+                return new ResponseDTO<UserDTO>(true, getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY,
+                        null, Locale.getDefault()), dataBinder.bindToUserSummaryDTO(optionalUser.get()));
+            } else {
+                return new ResponseDTO(false, getMessage(MessageConstants.OPERATION_NOT_PERMITTED));
+            }
+        }
+        return new ResponseDTO(false, getMessage(MessageConstants.USER_NOT_FOUND, id));
+    }
+
+    @Override
+    public ResponseDTO editUserDetails(UserDTO userDTO) {
+
+        ResponseDTO responseDTO = new ResponseDTO(false, getMessage(MessageConstants.USER_NOT_FOUND));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User tokenUser = (User) authentication.getPrincipal();
+
+        if (tokenUser.getRole().name().equals((Role.SUPER_ADMIN).name()) || tokenUser.getUsername().equals(userDTO.getUsername())) {
+            Optional<User> optionalUser = userRepository.findById(userDTO.getId());
+            User usernameUser = userRepository.findByUsername(userDTO.getUsername());
+            User emailUser = userRepository.findByEmail(userDTO.getEmailId());
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                if (emailUser != null && !emailUser.getId().equals(user.getId())
+                    || usernameUser != null && !usernameUser.getId().equals(user.getId())) {
+                    responseDTO.setStatus(false);
+                    responseDTO.setMessage(getMessage(MessageConstants.EMAIL_USERNAME_EXIST));
+                    return responseDTO;
+                }
+                user.setUsername(userDTO.getUsername());
+                user.setEmail(userDTO.getEmailId());
+                user.setName(userDTO.getName());
+                user.setPhoneNumber(userDTO.getPhoneNumber());
+
+                if (Objects.nonNull(userDTO.getAccountEnabled())) {
+                    if (tokenUser.getRole().name().equals((Role.SUPER_ADMIN).name()))
+                        user.setAccountEnabled(userDTO.getAccountEnabled());
+                    else
+                        userDTO.setAccountEnabled(user.getAccountEnabled());
+                }
+
+                userRepository.save(user);
+
+                responseDTO.setStatus(true);
+                responseDTO.setMessage(getMessage(MessageConstants.USER_UPDATED));
+                responseDTO.setAuditResponse(AuditResponseDTO.createWithTarget(user.getId()));
+                responseDTO.setData(userDTO);
+                return responseDTO;
+            }
+        }
+        return new ResponseDTO(false, getMessage(MessageConstants.OPERATION_NOT_PERMITTED));
+    }
+
+    @Override
+    public String logout(String token) {
+        return null;
     }
 
     private void validateCreateUserRequest(UserDTO userDTO, ResponseDTO responseDTO) {
@@ -136,5 +200,19 @@ public class UserServiceImpl extends MessageService implements UserService {
         if (!userDTO.getEmailId().matches(Constants.EMAIL_PATTERN))
             responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage("invalid.user.email")));
 
+    }
+
+    public User getCurrentLoggedInUser() {
+        User user = null;
+        if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null
+                && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
+            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
+                user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                if (user != null) {
+                    user = userRepository.findById(user.getId()).orElse(null);
+                }
+            }
+        }
+        return user;
     }
 }

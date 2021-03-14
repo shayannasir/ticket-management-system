@@ -41,17 +41,17 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseDTO<LoginResponseDTO> login(@RequestBody LoginRequestDTO authtenticationRequest) {
+    public ResponseDTO<LoginResponseDTO> login(@RequestBody LoginRequestDTO authenticationRequest) {
 
-        if (StringUtils.isEmpty(authtenticationRequest.getUsername()) || StringUtils.isEmpty(authtenticationRequest.getPassword())) {
+        if (StringUtils.isEmpty(authenticationRequest.getUsername()) || StringUtils.isEmpty(authenticationRequest.getPassword())) {
             return new ResponseDTO<>(false, messageService.getMessage(MessageConstants.USERNAME_PASSWORD_NOT_NULL));
         }
 
         try {
             final Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            authtenticationRequest.getUsername(),
-                            authtenticationRequest.getPassword())
+                            authenticationRequest.getUsername(),
+                            authenticationRequest.getPassword())
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return userService.login(authentication);
@@ -63,4 +63,16 @@ public class UserController {
             return new ResponseDTO<>(false, ex.getMessage());
         }
     }
+
+    @GetMapping("/details/{id}")
+    public ResponseDTO getUserDetails(@PathVariable String id) {
+        Long ID = Long.parseLong(id.trim());
+        return userService.getUserDetails(ID);
+    }
+
+    @PostMapping("/update")
+    public ResponseDTO updateUser(@RequestBody UserDTO userDTO) {
+        return userService.editUserDetails(userDTO);
+    }
+
 }

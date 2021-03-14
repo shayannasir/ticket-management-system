@@ -48,6 +48,12 @@ public class ResponseDTO<T> {
         return this;
     }
 
+    public ResponseDTO(Boolean status, String message, T data) {
+        this.status = status;
+        this.message = message;
+        this.data = data;
+    }
+
     public ResponseDTO(Boolean status, String message, List<ErrorDTO> errorDTOS) {
         this.status = status;
         this.message = message;

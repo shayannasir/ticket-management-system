@@ -12,4 +12,8 @@ public interface UserService extends UserDetailsService {
     String logout (String token);
 
     ResponseDTO<LoginResponseDTO> login(Authentication authentication);
+
+    ResponseDTO getUserDetails(Long id);
+
+    ResponseDTO editUserDetails(UserDTO userDTO);
 }

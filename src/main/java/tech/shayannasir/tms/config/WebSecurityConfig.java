@@ -19,8 +19,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import tech.shayannasir.tms.filter.JwtRequestFilter;
 import tech.shayannasir.tms.service.UserService;
 
-import java.util.Collections;
-
 import static tech.shayannasir.tms.enums.Role.*;
 
 @Configuration
@@ -49,9 +47,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
-        // configure AuthenticationManager so that it knows from where to load
-        // user for matching credentials
-        // Use BCryptPasswordEncoder
         auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
     }
 
@@ -65,7 +60,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity)
             throws Exception {
-        // We don't need CSRF for this example
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests()
@@ -73,9 +67,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 //                .antMatchers("/user/create")
 //                .hasAuthority(SUPER_ADMIN.name())
-
-                .antMatchers("/**")
-                .hasAnyAuthority(ADMIN.name(), USER.name())
 
                 // all other requests need to be authenticated
                 .anyRequest().authenticated().and()

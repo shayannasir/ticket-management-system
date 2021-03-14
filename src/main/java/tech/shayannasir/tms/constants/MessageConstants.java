@@ -5,6 +5,10 @@ public class MessageConstants {
     public static final String PASSWORD_PATTERN_NOT_MATCH = "password.pattern.not.match";
     public static final String PASSWORD_NOT_NULL = "password.not.null";
     public static final String USERNAME_NOT_NULL = "username.not.null";
+    public static final String REQUEST_PROCESSED_SUCCESSFULLY = "request.processed.successfully";
+    public static final String OPERATION_NOT_PERMITTED = "operation.not.permitted";
+    public static final String USER_NOT_FOUND = "user.not.found.by.id";
+    public static final String USER_UPDATED = "user.updated";
 
     public static final String INVALID_MOBILE_NUMBER = "invalid.mobile.number";
     public static final String INVALID_USERNAME = "invalid.username";
