@@ -14,7 +14,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity(name = "audit_trail")
-public class AuditTrail extends AuditEntity<String> {
+public class AuditTrail extends AuditEntity {
 
     @Id
     Long documentId;

@@ -10,4 +10,6 @@ A Spring boot based backend REST application for handling all APIs concerning th
     
 ###Todos
 -   Make creation of users specific to SUPER_ADMIN
--   Migrate from ***Long*** based IDs to **UUID** based IDs 
+-   Migrate from ***Long*** based IDs to **UUID** based IDs
+-   Ticket Controller
+-   Add AOP based auditing (probably annotated)

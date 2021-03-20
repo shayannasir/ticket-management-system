@@ -216,7 +216,6 @@ public class UserServiceImpl extends MessageService implements UserService {
                     .emailId(user.getEmail())
                     .username(user.getUsername())
                     .accountEnabled(user.getAccountEnabled())
-                    .createdDate(user.getCreatedDate())
                     .build();
             userDTOS.add(userDTO);
         });

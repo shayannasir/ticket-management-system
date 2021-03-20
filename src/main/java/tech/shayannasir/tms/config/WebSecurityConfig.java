@@ -41,7 +41,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             new AntPathRequestMatcher("/hello"),
 
             new AntPathRequestMatcher("/user/login"),
-            new AntPathRequestMatcher("/user/create"),
 
             /* Swagger routes */
             new AntPathRequestMatcher("/swagger-ui"),

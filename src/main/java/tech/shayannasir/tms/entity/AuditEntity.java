@@ -1,37 +1,35 @@
 package tech.shayannasir.tms.entity;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.Date;
 
 @Getter
 @Setter
-public abstract class AuditEntity<T extends Serializable> implements Serializable {
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public abstract class AuditEntity extends BaseEntity {
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreatedDate
+    @CreationTimestamp
     private Date createdDate;
 
-    @CreatedBy
-    private User createdBy;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @LastModifiedDate
+    @UpdateTimestamp
     private Date lastModifiedDate;
 
-    @LastModifiedBy
-    private User lastModifiedBy;
+    @CreatedBy
+    private Long createdBy;
 
-    @Version
-    private Long version;
+    @LastModifiedBy
+    private Long lastModifiedBy;
 
 }

@@ -9,7 +9,6 @@ public class MessageConstants {
     public static final String OPERATION_NOT_PERMITTED = "operation.not.permitted";
     public static final String USER_NOT_FOUND = "user.not.found.by.id";
     public static final String USER_UPDATED = "user.updated";
-
     public static final String INVALID_MOBILE_NUMBER = "invalid.mobile.number";
     public static final String INVALID_USERNAME = "invalid.username";
     public static final String INVALID_NAME = "invalid.name";
@@ -23,9 +22,9 @@ public class MessageConstants {
     public static final String USERNAME_PASSWORD_NOT_MATCH = "username.password.not.match";
     public static final String USER_DISABLED = "user.disabled";
     public static final String LOGIN_SUCCESS = "login.success";
-
-
     public static final String USER_CREATED = "user.creation";
     public static final String ROLE_NOT_EXIST = "role.not.exist";
-
+    public static final String TAG_EXISTS = "tag.exists";
+    public static final String INVALID_REQUEST_BODY = "request.body.invalid";
+    public static final String TAG_CREATED_SUCCESS = "tag.creation.success";
 }
