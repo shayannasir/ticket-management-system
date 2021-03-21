@@ -12,9 +12,7 @@ import javax.persistence.Entity;
 public class Tag extends AuditEntity {
 
     String name;
-
     String value;
-
     Boolean enabled;
 
 }

@@ -1,8 +1,13 @@
 package tech.shayannasir.tms.service;
 
+import tech.shayannasir.tms.dto.ResourceEnableDTO;
 import tech.shayannasir.tms.dto.ResponseDTO;
-import tech.shayannasir.tms.dto.TagDTO;
+import tech.shayannasir.tms.dto.TicketResourceDTO;
 
 public interface ResourceService {
-    ResponseDTO createNewTag(TagDTO tagDTO);
+    ResponseDTO createNewTag(TicketResourceDTO ticketResourceDTO);
+    ResponseDTO createNewClassification(TicketResourceDTO ticketResourceDTO);
+    ResponseDTO createNewPriority(TicketResourceDTO ticketResourceDTO);
+    ResponseDTO createNewStatus(TicketResourceDTO ticketResourceDTO);
+    ResponseDTO updateEnableStatus(ResourceEnableDTO resourceEnableDTO);
 }

@@ -1,5 +1,6 @@
 package tech.shayannasir.tms.controller;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.shayannasir.tms.constants.MessageConstants;
+import tech.shayannasir.tms.dto.ResourceEnableDTO;
 import tech.shayannasir.tms.dto.ResponseDTO;
 import tech.shayannasir.tms.dto.TagDTO;
+import tech.shayannasir.tms.dto.TicketResourceDTO;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.ResourceService;
 
@@ -27,10 +30,39 @@ public class ResourceController {
     @Autowired
     private MessageService messageService;
 
-    @PostMapping("/tag/create")
-    public ResponseDTO createTag(@Valid @RequestBody TagDTO tagDTO, BindingResult bindingResult) {
+    @PostMapping("/create/tag")
+    public ResponseDTO createTag(@Valid @RequestBody TicketResourceDTO ticketResourceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
-        return resourceService.createNewTag(tagDTO);
+        return resourceService.createNewTag(ticketResourceDTO);
+    }
+
+    @PostMapping("/create/ticket/classification")
+    public ResponseDTO createTicketClassification(@Valid @RequestBody TicketResourceDTO ticketResourceDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
+        return resourceService.createNewClassification(ticketResourceDTO);
+    }
+
+    @PostMapping("/create/ticket/priority")
+    public ResponseDTO createTicketPriority(@Valid @RequestBody TicketResourceDTO ticketResourceDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
+        return resourceService.createNewPriority(ticketResourceDTO);
+    }
+
+    @PostMapping("/create/ticket/status")
+    public ResponseDTO createTicketStatus(@Valid @RequestBody TicketResourceDTO ticketResourceDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
+        return resourceService.createNewStatus(ticketResourceDTO);
+    }
+
+    /* For Enabling Tag, Classification, Priority and Status */
+    @PostMapping("/enable")
+    public ResponseDTO enableResource(@Valid @RequestBody ResourceEnableDTO resourceEnableDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
+        return resourceService.updateEnableStatus(resourceEnableDTO);
     }
 }

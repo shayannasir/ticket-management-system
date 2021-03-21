@@ -6,20 +6,15 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketClassification {
-
-    @Id
-    UUID id;
+public class TicketClassification extends AuditEntity {
 
     String name;
-
     String value;
+    Boolean enabled;
 
 }

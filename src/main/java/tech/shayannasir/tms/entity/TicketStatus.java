@@ -14,7 +14,7 @@ import javax.persistence.Entity;
 public class TicketStatus extends AuditEntity {
 
     String name;
-
     String value;
+    Boolean enabled;
 
 }

@@ -82,8 +82,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .requestMatchers(PUBLIC_URLS).permitAll()
 
-
+                // User creation restricted to SUPER_ADMIN
                 .antMatchers("/user/create")
+                .hasAuthority(SUPER_ADMIN.name())
+
+                // Resource creation restricted to SUPER_ADMIN
+                .antMatchers("/resource/create/**")
                 .hasAuthority(SUPER_ADMIN.name())
 
                 // all other requests need to be authenticated

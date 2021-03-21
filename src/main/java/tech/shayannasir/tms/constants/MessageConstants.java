@@ -24,7 +24,15 @@ public class MessageConstants {
     public static final String LOGIN_SUCCESS = "login.success";
     public static final String USER_CREATED = "user.creation";
     public static final String ROLE_NOT_EXIST = "role.not.exist";
-    public static final String TAG_EXISTS = "tag.exists";
     public static final String INVALID_REQUEST_BODY = "request.body.invalid";
+    public static final String TAG_EXISTS = "tag.exists";
     public static final String TAG_CREATED_SUCCESS = "tag.creation.success";
+    public static final String TICKET_STATUS_EXISTS = "ticket.status.exists";
+    public static final String TICKET_STATUS_CREATED_SUCCESS = "ticket.status.creation.success";
+    public static final String TICKET_PRIORITY_EXISTS = "ticket.priority.exists";
+    public static final String TICKET_PRIORITY_CREATED_SUCCESS = "ticket.priority.creation.success";
+    public static final String TICKET_CLASSIFICATION_EXISTS = "ticket.classification.exists";
+    public static final String TICKET_CLASSIFICATION_CREATED_SUCCESS = "ticket.classification.creation.success";
+    public static final String RESOURCE_UPDATE_SUCCESS = "resource.update.success";
+    public static final String RESOURCE_UPDATE_EXISTS = "resource.update.not.exist";
 }
