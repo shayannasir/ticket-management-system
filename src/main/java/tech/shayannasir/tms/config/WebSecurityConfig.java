@@ -90,6 +90,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/resource/create/**")
                 .hasAuthority(SUPER_ADMIN.name())
 
+                .antMatchers("/resource/enable")
+                .hasAuthority(SUPER_ADMIN.name())
+
                 // all other requests need to be authenticated
                 .anyRequest().authenticated().and()
 
