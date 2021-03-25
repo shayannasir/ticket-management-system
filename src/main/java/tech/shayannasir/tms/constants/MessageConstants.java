@@ -40,4 +40,8 @@ public class MessageConstants {
     public static final String TICKET_INVALID_CLASSIFICATION = "ticket.invalid.classification";
     public static final String TICKET_INVALID_TAG = "ticket.invalid.tag";
     public static final String TICKET_CREATE_SUCCESS = "ticket.create.success";
+    public static final String INVALID_USER_ID = "invalid.user.id";
+    public static final String INVALID_TICKET_ID = "invalid.ticket.id";
+    public static final String TICKET_NOT_FOUND = "ticket.not.found.by.id";
+    public static final String TICKET_UPDATE_SUCCESS = "ticket.update.success";
 }

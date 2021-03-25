@@ -2,21 +2,18 @@ package tech.shayannasir.tms.controller;
 
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tech.shayannasir.tms.constants.MessageConstants;
-import tech.shayannasir.tms.dto.ResponseDTO;
-import tech.shayannasir.tms.dto.TicketCreateDTO;
-import tech.shayannasir.tms.dto.TicketDTO;
+import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.TicketService;
 import tech.shayannasir.tms.util.ErrorUtil;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/ticket")
@@ -34,6 +31,29 @@ public class TicketController {
             return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
         } else
             return ticketService.createNewTicket(ticketCreateDTO);
+    }
+
+    @PostMapping("/update")
+    public ResponseDTO updateTicket(@Valid @RequestBody TicketRequestDTO ticketRequestDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
+        } else
+            return ticketService.editTicketDetails(ticketRequestDTO);
+    }
+
+    @GetMapping("/details/{id}")
+    public ResponseDTO getTicketDetails(@PathVariable String id) {
+        try {
+            Long ID = Long.parseLong(id.trim());
+            return ticketService.fetchTicketDetails(ID);
+        } catch (NumberFormatException nfe) {
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_TICKET_ID));
+        }
+    }
+
+    @PostMapping("/list")
+    public DataTableResponseDTO<Object, List<TicketResponseDTO>> getTicketList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
+        return ticketService.fetchListOfTickets(dataTableRequestDTO);
     }
 
 }

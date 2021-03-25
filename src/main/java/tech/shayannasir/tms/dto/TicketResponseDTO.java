@@ -1,8 +1,6 @@
 package tech.shayannasir.tms.dto;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import tech.shayannasir.tms.entity.Tag;
 import tech.shayannasir.tms.entity.TicketClassification;
@@ -14,7 +12,10 @@ import java.util.List;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketDTO {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TicketResponseDTO {
 
     Long id;
     String contactName;

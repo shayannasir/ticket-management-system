@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import tech.shayannasir.tms.constants.Constants;
 import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
+import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.UserService;
 
@@ -66,8 +67,12 @@ public class UserController {
 
     @GetMapping("/details/{id}")
     public ResponseDTO getUserDetails(@PathVariable String id) {
-        Long ID = Long.parseLong(id.trim());
-        return userService.getUserDetails(ID);
+        try {
+            Long ID = Long.parseLong(id.trim());
+            return userService.getUserDetails(ID);
+        } catch (NumberFormatException nfe) {
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_USER_ID));
+        }
     }
 
     @PostMapping("/update")
