@@ -35,4 +35,9 @@ public class MessageConstants {
     public static final String TICKET_CLASSIFICATION_CREATED_SUCCESS = "ticket.classification.creation.success";
     public static final String RESOURCE_UPDATE_SUCCESS = "resource.update.success";
     public static final String RESOURCE_UPDATE_EXISTS = "resource.update.not.exist";
+    public static final String TICKET_INVALID_STATUS = "ticket.invalid.status";
+    public static final String TICKET_INVALID_PRIORITY = "ticket.invalid.priority";
+    public static final String TICKET_INVALID_CLASSIFICATION = "ticket.invalid.classification";
+    public static final String TICKET_INVALID_TAG = "ticket.invalid.tag";
+    public static final String TICKET_CREATE_SUCCESS = "ticket.create.success";
 }

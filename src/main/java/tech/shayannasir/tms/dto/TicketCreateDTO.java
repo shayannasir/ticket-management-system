@@ -5,10 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import tech.shayannasir.tms.entity.Tag;
-import tech.shayannasir.tms.entity.TicketClassification;
-import tech.shayannasir.tms.entity.TicketPriority;
-import tech.shayannasir.tms.entity.TicketStatus;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -37,7 +33,7 @@ public class TicketCreateDTO {
     String priority;
     @NotNull
     String classification;
-    @NotNull
+    @NotBlank
     String description;
     @NotEmpty
     List<String> tags;

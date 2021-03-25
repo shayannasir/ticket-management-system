@@ -8,7 +8,6 @@ import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.ErrorDTO;
 import tech.shayannasir.tms.dto.ResponseDTO;
 import tech.shayannasir.tms.dto.TicketCreateDTO;
-import tech.shayannasir.tms.dto.TicketDTO;
 import tech.shayannasir.tms.entity.*;
 import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.repository.*;
@@ -18,7 +17,6 @@ import tech.shayannasir.tms.service.TicketService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class TicketServiceImpl extends MessageService implements TicketService {
@@ -48,17 +46,17 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         TicketClassification classification = ticketClassificationRepository.findByValue(ticketCreateDTO.getClassification());
 
         if (Objects.isNull(status))
-            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Ticket Status"));
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_STATUS)));
         if (Objects.isNull(priority))
-            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Ticket Priority"));
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_PRIORITY)));
         if (Objects.isNull(classification))
-            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Ticket Classification"));
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_CLASSIFICATION)));
 
         List<Tag> tags = new ArrayList<>();
         for (String tagValue : ticketCreateDTO.getTags()) {
             Tag tag = tagRepository.findByValue(tagValue);
             if (Objects.isNull(tag)) {
-                responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Ticket Tag"));
+                responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_TAG)));
                 break;
             }
             tags.add(tag);
@@ -83,9 +81,10 @@ public class TicketServiceImpl extends MessageService implements TicketService {
                 .tags(tags)
                 .build();
 
-        ticketRepository.save(ticket);
+        Ticket savedTicket = ticketRepository.save(ticket);
+        responseDTO.setData(savedTicket);
         responseDTO.setStatus(Boolean.TRUE);
-        responseDTO.setMessage("Ticket Created Successfully");
+        responseDTO.setMessage(getMessage(MessageConstants.TICKET_CREATE_SUCCESS));
         return responseDTO;
     }
 

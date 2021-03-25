@@ -11,8 +11,10 @@ import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.ResponseDTO;
 import tech.shayannasir.tms.dto.TicketCreateDTO;
 import tech.shayannasir.tms.dto.TicketDTO;
+import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.TicketService;
+import tech.shayannasir.tms.util.ErrorUtil;
 
 import javax.validation.Valid;
 
@@ -29,9 +31,9 @@ public class TicketController {
     @PostMapping("/create")
     public ResponseDTO createTicket (@Valid @RequestBody TicketCreateDTO ticketCreateDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
-        }
-        return ticketService.createNewTicket(ticketCreateDTO);
+            return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
+        } else
+            return ticketService.createNewTicket(ticketCreateDTO);
     }
 
 }

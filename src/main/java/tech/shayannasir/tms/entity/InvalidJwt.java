@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class InvalidJwt {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)

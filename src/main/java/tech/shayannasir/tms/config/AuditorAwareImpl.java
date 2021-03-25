@@ -3,9 +3,7 @@ package tech.shayannasir.tms.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
-import tech.shayannasir.tms.repository.UserRepository;
 import tech.shayannasir.tms.service.Impl.UserServiceImpl;
-import tech.shayannasir.tms.service.UserService;
 
 import java.util.Optional;
 
