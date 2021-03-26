@@ -2,6 +2,7 @@ package tech.shayannasir.tms.controller;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,7 @@ public class ResourceController {
         return resourceService.updateEnableStatus(resourceEnableDTO);
     }
 
+    @ApiOperation("Example Resource Types: TAG | STATUS | PRIORITY | CLASSIFICATION")
     @GetMapping("/fetch/{resourceType}")
     public ResponseDTO getResource(@PathVariable String resourceType) {
         if (StringUtils.isNotBlank(resourceType))
