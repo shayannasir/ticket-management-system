@@ -10,4 +10,5 @@ public interface ResourceService {
     ResponseDTO createNewPriority(TicketResourceDTO ticketResourceDTO);
     ResponseDTO createNewStatus(TicketResourceDTO ticketResourceDTO);
     ResponseDTO updateEnableStatus(ResourceEnableDTO resourceEnableDTO);
+    ResponseDTO getResourceByType(String resourceType);
 }

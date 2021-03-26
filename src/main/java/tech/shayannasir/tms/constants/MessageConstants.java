@@ -44,4 +44,9 @@ public class MessageConstants {
     public static final String INVALID_TICKET_ID = "invalid.ticket.id";
     public static final String TICKET_NOT_FOUND = "ticket.not.found.by.id";
     public static final String TICKET_UPDATE_SUCCESS = "ticket.update.success";
+    public static final String NO_TAG = "no.tags";
+    public static final String NO_STATUS = "no.status";
+    public static final String NO_PRIORITY = "no.priority";
+    public static final String NO_CLASSIFICATION = "no.classification";
+
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.entity.*;
@@ -16,7 +17,9 @@ import tech.shayannasir.tms.repository.TicketStatusRepository;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.ResourceService;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 
 @Service
 public class ResourceServiceImpl extends MessageService implements ResourceService {
@@ -179,6 +182,47 @@ public class ResourceServiceImpl extends MessageService implements ResourceServi
                 responseDTO.addToErrors(new ErrorDTO(ErrorCode.INVALID_REQUEST, "Invalid Resource"));
         }
         return responseDTO;
+    }
+
+    @Override
+    public ResponseDTO getResourceByType(String resourceType) {
+        try {
+            Resource resource = Resource.valueOf(resourceType);
+            ResponseDTO responseDTO = new ResponseDTO(Boolean.TRUE, getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY));
+            switch (resource) {
+                case TAG:
+                    List<Tag> tags = tagRepository.findAll();
+                    if (!CollectionUtils.isEmpty(tags))
+                        responseDTO.setData(tags);
+                    else
+                        return new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.NO_TAG));
+                    break;
+                case STATUS:
+                    List<TicketStatus> statuses = ticketStatusRepository.findAll();
+                    if (!CollectionUtils.isEmpty(statuses))
+                        responseDTO.setData(statuses);
+                    else
+                        return new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.NO_STATUS));
+                    break;
+                case PRIORITY:
+                    List<TicketPriority> priorities = ticketPriorityRepository.findAll();
+                    if (!CollectionUtils.isEmpty(priorities))
+                        responseDTO.setData(priorities);
+                    else
+                        return new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.NO_PRIORITY));
+                    break;
+                case CLASSIFICATION:
+                    List<TicketClassification> classifications = ticketClassificationRepository.findAll();
+                    if (!CollectionUtils.isEmpty(classifications))
+                        responseDTO.setData(classifications);
+                    else
+                        return new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.NO_CLASSIFICATION));
+                    break;
+            }
+            return responseDTO;
+        } catch (IllegalArgumentException e) {
+            return new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.INVALID_REQUEST));
+        }
     }
 
 }
