@@ -2,7 +2,10 @@ package tech.shayannasir.tms.binder;
 
 import org.springframework.stereotype.Component;
 import tech.shayannasir.tms.dto.UserDTO;
+import tech.shayannasir.tms.dto.UserDetailDTO;
 import tech.shayannasir.tms.entity.User;
+
+import java.util.Objects;
 
 @Component
 public class UserDataBinder {
@@ -21,6 +24,20 @@ public class UserDataBinder {
             userDTO.setLastLoginTimeStamp(user.getLastLoginTime().getTime());
         }
         return userDTO;
+    }
+
+    public UserDetailDTO bindDocumentToDetailDTO(User source) {
+        UserDetailDTO target = new UserDetailDTO();
+
+        if (Objects.nonNull(source)) {
+            target.setId(source.getId());
+            target.setUsername(source.getUsername());
+            target.setName(source.getName());
+            target.setEmail(source.getEmail());
+            target.setPhoneNumber(source.getPhoneNumber());
+            target.setRole(source.getRole().name());
+        }
+        return target;
     }
 
 }

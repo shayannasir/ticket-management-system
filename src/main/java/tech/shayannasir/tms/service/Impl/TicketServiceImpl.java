@@ -17,6 +17,7 @@ import tech.shayannasir.tms.entity.*;
 import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.repository.*;
 import tech.shayannasir.tms.service.MessageService;
+import tech.shayannasir.tms.service.ResourceService;
 import tech.shayannasir.tms.service.TicketService;
 
 import java.util.*;
@@ -36,6 +37,8 @@ public class TicketServiceImpl extends MessageService implements TicketService {
     private TagRepository tagRepository;
     @Autowired
     private TicketBinder dataBinder;
+    @Autowired
+    private ResourceService resourceService;
 
     @Override
     public ResponseDTO createNewTicket(TicketCreateDTO ticketCreateDTO) {
@@ -57,15 +60,7 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         if (Objects.isNull(classification))
             responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_CLASSIFICATION)));
 
-        List<Tag> tags = new ArrayList<>();
-        for (String tagValue : ticketCreateDTO.getTags()) {
-            Tag tag = tagRepository.findByValue(tagValue);
-            if (Objects.isNull(tag)) {
-                responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_TAG)));
-                break;
-            }
-            tags.add(tag);
-        }
+        List<Tag> tags = resourceService.mapTagValueToObjects(ticketCreateDTO.getTags(), responseDTO);
 
         if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
             responseDTO.setStatus(false);
@@ -143,6 +138,8 @@ public class TicketServiceImpl extends MessageService implements TicketService {
                     .classification(ticket.getClassification())
                     .description(ticket.getDescription())
                     .tags(ticket.getTags())
+                    .remarkComments(ticket.getRemarkComments())
+                    .resolutionComments(ticket.getResolutionComments())
                     .build();
             ticketDTOs.add(ticketResponseDTO);
         });
@@ -169,15 +166,7 @@ public class TicketServiceImpl extends MessageService implements TicketService {
             if (Objects.isNull(classification))
                 responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_CLASSIFICATION)));
 
-            List<Tag> tags = new ArrayList<>();
-            for (String tagValue : ticketRequestDTO.getTags()) {
-                Tag tag = tagRepository.findByValue(tagValue);
-                if (Objects.isNull(tag)) {
-                    responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_TAG)));
-                    break;
-                }
-                tags.add(tag);
-            }
+            List<Tag> tags = resourceService.mapTagValueToObjects(ticketRequestDTO.getTags(), responseDTO);
 
             if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
                 responseDTO.setStatus(false);

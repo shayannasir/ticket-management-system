@@ -5,50 +5,37 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import tech.shayannasir.tms.enums.ArticleStatus;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Entity
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ticket extends AuditEntity {
+@Entity
+public class Article extends AuditEntity{
 
-    String contactName;
-    String mobile;
-    String email;
-    String workID;
-    String subject;
+    String title;
     String description;
 
-    @ManyToOne
-    TicketStatus status;
-
-    @ManyToOne
-    TicketPriority priority;
-
-    @ManyToOne
-    TicketClassification classification;
+    ArticleStatus status;
 
     @ManyToMany
     List<Tag> tags;
 
     @OneToMany
     @Cascade(CascadeType.ALL)
-    List<Comment> remarkComments;
+    List<Comment> comments;
 
-    @OneToMany
-    @Cascade(CascadeType.ALL)
-    List<Comment> resolutionComments;
-
-
+    Long likes;
+    Long dislikes;
+    Long views;
 
 }

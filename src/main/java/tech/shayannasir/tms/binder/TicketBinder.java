@@ -36,6 +36,8 @@ public class TicketBinder {
         target.setClassification(source.getClassification());
         target.setDescription(source.getDescription());
         target.setTags(source.getTags());
+        target.setRemarkComments(source.getRemarkComments());
+        target.setResolutionComments(source.getResolutionComments());
 
         return target;
     }

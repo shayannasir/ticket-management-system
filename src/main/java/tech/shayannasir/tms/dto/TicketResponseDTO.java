@@ -2,10 +2,7 @@ package tech.shayannasir.tms.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import tech.shayannasir.tms.entity.Tag;
-import tech.shayannasir.tms.entity.TicketClassification;
-import tech.shayannasir.tms.entity.TicketPriority;
-import tech.shayannasir.tms.entity.TicketStatus;
+import tech.shayannasir.tms.entity.*;
 
 import java.util.List;
 
@@ -33,4 +30,8 @@ public class TicketResponseDTO {
     String description;
 
     List<Tag> tags;
+
+    List<Comment> remarkComments;
+
+    List<Comment> resolutionComments;
 }

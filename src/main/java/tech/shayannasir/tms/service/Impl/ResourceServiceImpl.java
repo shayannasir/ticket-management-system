@@ -17,9 +17,7 @@ import tech.shayannasir.tms.repository.TicketStatusRepository;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.ResourceService;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 @Service
 public class ResourceServiceImpl extends MessageService implements ResourceService {
@@ -222,6 +220,23 @@ public class ResourceServiceImpl extends MessageService implements ResourceServi
             return responseDTO;
         } catch (IllegalArgumentException e) {
             return new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.INVALID_REQUEST));
+        }
+    }
+
+    public List<Tag> mapTagValueToObjects(List<String> tagValues, ResponseDTO responseDTO) {
+        if (CollectionUtils.isEmpty(tagValues)) {
+            return new ArrayList<>(Collections.emptyList());
+        } else {
+            List<Tag> tags = new ArrayList<>();
+            for (String tagValue : tagValues) {
+                Tag tag = tagRepository.findByValue(tagValue);
+                if (Objects.isNull(tag)) {
+                    responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_TAG)));
+                    break;
+                }
+                tags.add(tag);
+            }
+            return tags;
         }
     }
 

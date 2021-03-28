@@ -1,10 +1,13 @@
 package tech.shayannasir.tms.util;
 
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.ErrorDTO;
 import tech.shayannasir.tms.dto.ResponseDTO;
 import tech.shayannasir.tms.enums.ErrorCode;
+import tech.shayannasir.tms.service.MessageService;
 
 import java.util.List;
 
@@ -23,4 +26,5 @@ public class ErrorUtil {
         }
         return responseDTO;
     }
+
 }
