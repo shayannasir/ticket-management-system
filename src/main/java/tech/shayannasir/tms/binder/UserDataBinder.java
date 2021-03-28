@@ -1,14 +1,21 @@
 package tech.shayannasir.tms.binder;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.shayannasir.tms.dto.CreatedModifiedUserDTO;
 import tech.shayannasir.tms.dto.UserDTO;
 import tech.shayannasir.tms.dto.UserDetailDTO;
 import tech.shayannasir.tms.entity.User;
+import tech.shayannasir.tms.repository.UserRepository;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class UserDataBinder {
+
+    @Autowired
+    private UserRepository userRepository;
 
     public UserDTO bindToUserSummaryDTO(User user) {
 
@@ -38,6 +45,15 @@ public class UserDataBinder {
             target.setRole(source.getRole().name());
         }
         return target;
+    }
+
+    public CreatedModifiedUserDTO fetchCreatedAndModifiedUsersFor(Long createdID, Long modifiedID) {
+        CreatedModifiedUserDTO createdModifiedUserDTO = new CreatedModifiedUserDTO();
+        Optional<User> createdBy = userRepository.findById(createdID);
+        createdBy.ifPresent(user -> createdModifiedUserDTO.setCreatedBy(bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
+        Optional<User> modifiedBy = userRepository.findById(modifiedID);
+        createdBy.ifPresent(user -> createdModifiedUserDTO.setModifiedBy(bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
+        return createdModifiedUserDTO;
     }
 
 }

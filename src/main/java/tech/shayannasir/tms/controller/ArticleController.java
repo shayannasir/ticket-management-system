@@ -1,18 +1,17 @@
 package tech.shayannasir.tms.controller;
 
+import com.fasterxml.jackson.databind.util.ObjectBuffer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import tech.shayannasir.tms.dto.ArticleInsightRequestDTO;
-import tech.shayannasir.tms.dto.ArticleRequestDTO;
-import tech.shayannasir.tms.dto.CommentRequestDTO;
-import tech.shayannasir.tms.dto.ResponseDTO;
+import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.service.ArticleService;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.util.ErrorUtil;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/article")
@@ -46,6 +45,11 @@ public class ArticleController {
             return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
         }
         return articleService.performAction(requestDTO);
+    }
+
+    @PostMapping("/list")
+    public DataTableResponseDTO<Object, List<ArticleResponseDTO>> getArticleList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
+        return articleService.fetchListOfArticles(dataTableRequestDTO);
     }
 
 }

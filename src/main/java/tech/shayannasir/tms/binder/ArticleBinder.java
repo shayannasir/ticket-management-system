@@ -3,6 +3,7 @@ package tech.shayannasir.tms.binder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.shayannasir.tms.dto.ArticleResponseDTO;
+import tech.shayannasir.tms.dto.CreatedModifiedUserDTO;
 import tech.shayannasir.tms.entity.Article;
 import tech.shayannasir.tms.entity.User;
 import tech.shayannasir.tms.repository.UserRepository;
@@ -19,6 +20,7 @@ public class ArticleBinder {
 
     public ArticleResponseDTO bindDocumentToDTO(Article source) {
         ArticleResponseDTO target = new ArticleResponseDTO();
+        CreatedModifiedUserDTO createdModifiedUserDTO = userDataBinder.fetchCreatedAndModifiedUsersFor(source.getCreatedBy(), source.getLastModifiedBy());
 
         target.setId(source.getId());
         target.setTitle(source.getTitle());
@@ -31,12 +33,8 @@ public class ArticleBinder {
         target.setViews(source.getViews());
         target.setCreatedDate(source.getCreatedDate());
         target.setLastModifiedDate(source.getLastModifiedDate());
-
-        Optional<User> createdBy = userRepository.findById(source.getCreatedBy());
-        createdBy.ifPresent(user -> target.setCreatedBy(userDataBinder.bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
-
-        Optional<User> modifiedBy = userRepository.findById(source.getLastModifiedBy());
-        modifiedBy.ifPresent(user -> target.setLastModifiedBy(userDataBinder.bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
+        target.setCreatedBy(createdModifiedUserDTO.getCreatedBy());
+        target.setLastModifiedBy(createdModifiedUserDTO.getModifiedBy());
 
         return target;
     }
