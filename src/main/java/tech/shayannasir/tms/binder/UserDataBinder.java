@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component;
 import tech.shayannasir.tms.dto.CreatedModifiedUserDTO;
 import tech.shayannasir.tms.dto.UserDTO;
 import tech.shayannasir.tms.dto.UserDetailDTO;
+import tech.shayannasir.tms.entity.Department;
 import tech.shayannasir.tms.entity.User;
+import tech.shayannasir.tms.repository.DepartmentRepository;
 import tech.shayannasir.tms.repository.UserRepository;
 
 import java.util.Objects;
@@ -30,6 +32,11 @@ public class UserDataBinder {
         if (user.getLastLoginTime() != null) {
             userDTO.setLastLoginTimeStamp(user.getLastLoginTime().getTime());
         }
+        userDTO.setDepartment(user.getDepartment().getName());
+        userDTO.setTotalTasks(user.getTotalTasks());
+        userDTO.setTotalTickets(user.getTotalTickets());
+        userDTO.setDueTasks(user.getDueTasks());
+        userDTO.setDueTickets(user.getDueTickets());
         return userDTO;
     }
 

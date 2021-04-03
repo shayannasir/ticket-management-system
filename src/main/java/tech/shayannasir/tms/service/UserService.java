@@ -19,4 +19,14 @@ public interface UserService extends UserDetailsService {
     ResponseDTO editUserDetails(UserDTO userDTO);
 
     DataTableResponseDTO<Object, List<UserDTO>> getListOfUsers(DataTableRequestDTO dataTableRequestDTO);
+
+    ResponseDTO editEndUserDetails(EndUserDTO endUserDTO);
+
+    ResponseDTO fetchEndUserByEmail(String email);
+
+    DataTableResponseDTO<Object, List<EndUserDTO>> getListOfEndUsers(DataTableRequestDTO dataTableRequestDTO);
+
+    ResponseDTO forgotUserPassword(ForgotPasswordDTO forgotPasswordDTO);
+
+    ResponseDTO resetUserPassword(ResetPasswordDTO resetPasswordDTO);
 }

@@ -2,6 +2,7 @@ package tech.shayannasir.tms.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import tech.shayannasir.tms.enums.Role;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,28 +23,31 @@ import java.util.Date;
 public class User extends AuditEntity implements UserDetails {
 
     String username;
-
     String password;
-
-    String name;
-
-    String email;
-
-    String phoneNumber;
-
     Role role;
 
+    String name;
+    String designation;
+    String email;
+    String empID;
+    String phoneNumber;
+
+    @OneToOne
+    Department department;
+
+    Long totalTickets;
+    Long dueTickets;
+
+    Long totalTasks;
+    Long dueTasks;
+
     Boolean accountEnabled;
-
     Boolean accountExpired = false;
-
     Boolean accountLocked = false;
-
     Boolean credentialsExpired = false;
 
     @Temporal(TemporalType.TIMESTAMP)
     Date lastLoginTime;
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

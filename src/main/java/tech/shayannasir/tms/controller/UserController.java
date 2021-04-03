@@ -16,10 +16,13 @@ import org.springframework.web.bind.annotation.*;
 import tech.shayannasir.tms.constants.Constants;
 import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
+import tech.shayannasir.tms.entity.EndUser;
 import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.UserService;
+import tech.shayannasir.tms.util.ErrorUtil;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -38,6 +41,8 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseDTO createUser(@RequestBody UserDTO userDTO, BindingResult bindingResult) throws Exception {
+        if (bindingResult.hasErrors())
+            return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
         return userService.createUser(userDTO);
     }
 
@@ -80,6 +85,20 @@ public class UserController {
         return userService.editUserDetails(userDTO);
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseDTO forgotPassword(@Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
+        return userService.forgotUserPassword(forgotPasswordDTO);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseDTO forgotPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
+        return userService.resetUserPassword(resetPasswordDTO);
+    }
+
     @PostMapping("/logout")
     public ResponseDTO logout(@RequestHeader(Constants.TOKEN_HEADER) String authHeader) {
         if (StringUtils.isNotEmpty(authHeader)) {
@@ -94,5 +113,28 @@ public class UserController {
         return userService.getListOfUsers(dataTableRequestDTO);
 
     }
+
+    /*
+    * End User APIs
+    * */
+    @PostMapping("/end-user/update")
+    public ResponseDTO editEndUser(EndUserDTO endUserDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
+        return userService.editEndUserDetails(endUserDTO);
+    }
+
+    @GetMapping("/end-user/fetch")
+    public ResponseDTO getEndUser(@RequestParam String email) {
+        if (StringUtils.isBlank(email))
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_EMAIL));
+        return userService.fetchEndUserByEmail(email);
+    }
+
+    @PostMapping("/end-user/list")
+    public DataTableResponseDTO<Object, List<EndUserDTO>> getEndUserList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
+        return userService.getListOfEndUsers(dataTableRequestDTO);
+    }
+
 
 }

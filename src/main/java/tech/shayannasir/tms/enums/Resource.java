@@ -4,5 +4,7 @@ public enum Resource {
     TAG,
     CLASSIFICATION,
     PRIORITY,
-    STATUS
+    STATUS,
+    DEPARTMENT,
+    SOURCE
 }

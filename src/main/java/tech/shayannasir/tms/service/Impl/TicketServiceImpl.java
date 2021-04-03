@@ -1,5 +1,6 @@
 package tech.shayannasir.tms.service.Impl;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,16 +40,18 @@ public class TicketServiceImpl extends MessageService implements TicketService {
     private TicketBinder dataBinder;
     @Autowired
     private ResourceService resourceService;
+    @Autowired
+    private EndUserRepository endUserRepository;
 
     @Override
     public ResponseDTO createNewTicket(TicketCreateDTO ticketCreateDTO) {
-        ResponseDTO responseDTO = new ResponseDTO();
+        ResponseDTO responseDTO = new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.INVALID_REQUEST));
+
         validateCreateTicketRequest(ticketCreateDTO, responseDTO);
-        if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
-            responseDTO.setStatus(false);
-            responseDTO.setMessage(getMessage(MessageConstants.INVALID_REQUEST));
+
+        if (!CollectionUtils.isEmpty(responseDTO.getErrors()))
             return responseDTO;
-        }
+
         TicketStatus status = ticketStatusRepository.findByValue(ticketCreateDTO.getStatus());
         TicketPriority priority = ticketPriorityRepository.findByValue(ticketCreateDTO.getPriority());
         TicketClassification classification = ticketClassificationRepository.findByValue(ticketCreateDTO.getClassification());
@@ -62,19 +65,38 @@ public class TicketServiceImpl extends MessageService implements TicketService {
 
         List<Tag> tags = resourceService.mapTagValueToObjects(ticketCreateDTO.getTags(), responseDTO);
 
-        if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
-            responseDTO.setStatus(false);
-            responseDTO.setMessage(getMessage(MessageConstants.INVALID_REQUEST));
+        if (!CollectionUtils.isEmpty(responseDTO.getErrors()))
             return responseDTO;
+
+        EndUser existingEndUser = endUserRepository.findByEmail(ticketCreateDTO.getEmail());
+        if (Objects.nonNull(existingEndUser)) {
+            if (!isValidEndUserDetails(ticketCreateDTO, existingEndUser)) {
+                responseDTO.setMessage("Inconsistent End User Details");
+                responseDTO.setData(existingEndUser);
+                return responseDTO;
+            }
+            existingEndUser.setTotalTickets(existingEndUser.getTotalTickets() + 1);
+            existingEndUser.setDueTickets(existingEndUser.getDueTickets() + 1);
+        } else {
+            existingEndUser = EndUser.builder()
+                    .name(ticketCreateDTO.getContactName())
+                    .number(ticketCreateDTO.getMobile())
+                    .email(ticketCreateDTO.getEmail())
+                    .workID(ticketCreateDTO.getWorkID())
+                    .totalTickets(1L)
+                    .dueTickets(1L)
+                    .build();
         }
 
+        EndUser savedEndUser = endUserRepository.save(existingEndUser);
+
+
         Ticket ticket = Ticket.builder()
-                .contactName(ticketCreateDTO.getContactName())
-                .mobile(ticketCreateDTO.getMobile())
-                .email(ticketCreateDTO.getEmail())
-                .workID(ticketCreateDTO.getWorkID())
+                .endUser(savedEndUser)
                 .subject(ticketCreateDTO.getSubject())
                 .description(ticketCreateDTO.getDescription())
+                .dueDate(ticketCreateDTO.getDueDate())
+                .assignedOn(new Date())
                 .status(status)
                 .priority(priority)
                 .classification(classification)
@@ -82,6 +104,7 @@ public class TicketServiceImpl extends MessageService implements TicketService {
                 .build();
 
         Ticket savedTicket = ticketRepository.save(ticket);
+
         responseDTO.setData(savedTicket);
         responseDTO.setStatus(Boolean.TRUE);
         responseDTO.setMessage(getMessage(MessageConstants.TICKET_CREATE_SUCCESS));
@@ -128,10 +151,6 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         ticketResults.stream().forEach(ticket -> {
             TicketResponseDTO ticketResponseDTO = TicketResponseDTO.builder()
                     .id(ticket.getId())
-                    .contactName(ticket.getContactName())
-                    .mobile(ticket.getMobile())
-                    .email(ticket.getEmail())
-                    .workID(ticket.getWorkID())
                     .subject(ticket.getSubject())
                     .status(ticket.getStatus())
                     .priority(ticket.getPriority())
@@ -175,10 +194,10 @@ public class TicketServiceImpl extends MessageService implements TicketService {
             }
 
             Ticket ticket = existingTicket.get();
-            ticket.setContactName(ticketRequestDTO.getContactName());
-            ticket.setEmail(ticketRequestDTO.getEmail());
-            ticket.setMobile(ticketRequestDTO.getMobile());
-            ticket.setWorkID(ticketRequestDTO.getWorkID());
+//            ticket.setContactName(ticketRequestDTO.getContactName());
+//            ticket.setEmail(ticketRequestDTO.getEmail());
+//            ticket.setMobile(ticketRequestDTO.getMobile());
+//            ticket.setWorkID(ticketRequestDTO.getWorkID());
             ticket.setDescription(ticketRequestDTO.getDescription());
             ticket.setSubject(ticketRequestDTO.getSubject());
             ticket.setStatus(status);
@@ -203,5 +222,12 @@ public class TicketServiceImpl extends MessageService implements TicketService {
 
         if (!ticketCreateDTO.getEmail().matches(Constants.EMAIL_PATTERN))
             responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.INVALID_EMAIL)));
+    }
+
+    private Boolean isValidEndUserDetails(TicketCreateDTO source, EndUser target) {
+        return source.getContactName().equals(target.getName())
+                && source.getEmail().equals(target.getEmail())
+                && source.getMobile().equals(target.getNumber())
+                && source.getWorkID().equals(target.getWorkID());
     }
 }

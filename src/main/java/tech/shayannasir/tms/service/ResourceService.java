@@ -12,7 +12,10 @@ public interface ResourceService {
     ResponseDTO createNewClassification(TicketResourceDTO ticketResourceDTO);
     ResponseDTO createNewPriority(TicketResourceDTO ticketResourceDTO);
     ResponseDTO createNewStatus(TicketResourceDTO ticketResourceDTO);
+    ResponseDTO createNewDepartment(TicketResourceDTO ticketResourceDTO);
+    ResponseDTO createNewTicketSource(TicketResourceDTO ticketResourceDTO);
     ResponseDTO updateEnableStatus(ResourceEnableDTO resourceEnableDTO);
+
     ResponseDTO getResourceByType(String resourceType);
 
     List<Tag> mapTagValueToObjects (List<String> tagValues, ResponseDTO responseDTO);

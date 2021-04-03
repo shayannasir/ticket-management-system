@@ -58,6 +58,21 @@ public class ResourceController {
         return resourceService.createNewStatus(ticketResourceDTO);
     }
 
+    @PostMapping("/create/department")
+    public ResponseDTO createDepartment(@Valid @RequestBody TicketResourceDTO ticketResourceDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
+        return resourceService.createNewDepartment(ticketResourceDTO);
+    }
+
+    @PostMapping("/create/ticket/source")
+    public ResponseDTO createTicketSource(@Valid @RequestBody TicketResourceDTO ticketResourceDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.INVALID_REQUEST_BODY));
+        return resourceService.createNewTicketSource(ticketResourceDTO);
+    }
+
+
     /* For Enabling Tag, Classification, Priority and Status */
     @PostMapping("/enable")
     public ResponseDTO enableResource(@Valid @RequestBody ResourceEnableDTO resourceEnableDTO, BindingResult bindingResult) {

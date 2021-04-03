@@ -39,6 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
             new AntPathRequestMatcher("/noauth/**"),
             new AntPathRequestMatcher("/hello"),
+//            new AntPathRequestMatcher("/user/create"),
 
             new AntPathRequestMatcher("/user/login"),
 
@@ -84,6 +85,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 // User creation restricted to SUPER_ADMIN
                 .antMatchers("/user/create")
+                .hasAuthority(SUPER_ADMIN.name())
+
+                // User list restricted to SUPER_ADMIN
+                .antMatchers("/user/list")
                 .hasAuthority(SUPER_ADMIN.name())
 
                 // Resource creation restricted to SUPER_ADMIN

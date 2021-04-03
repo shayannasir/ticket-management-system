@@ -9,15 +9,11 @@ public class TicketBinder {
 
     public Ticket bindtoDocument(TicketResponseDTO ticketDTO) {
         return Ticket.builder()
-                .contactName(ticketDTO.getContactName())
-                .mobile(ticketDTO.getMobile())
                 .description(ticketDTO.getDescription())
                 .classification(ticketDTO.getClassification())
                 .priority(ticketDTO.getPriority())
                 .status(ticketDTO.getStatus())
-                .email(ticketDTO.getEmail())
                 .subject(ticketDTO.getSubject())
-                .workID(ticketDTO.getWorkID())
                 .tags(ticketDTO.getTags())
                 .build();
     }
@@ -26,10 +22,10 @@ public class TicketBinder {
         TicketResponseDTO target = new TicketResponseDTO();
 
         target.setId(source.getId());
-        target.setContactName(source.getContactName());
-        target.setMobile(source.getMobile());
-        target.setEmail(source.getEmail());
-        target.setWorkID(source.getWorkID());
+//        target.setContactName(source.getContactName());
+//        target.setMobile(source.getMobile());
+//        target.setEmail(source.getEmail());
+//        target.setWorkID(source.getWorkID());
         target.setSubject(source.getSubject());
         target.setStatus(source.getStatus());
         target.setPriority(source.getPriority());
