@@ -36,4 +36,6 @@ public class TicketResponseDTO {
 
     List<Comment> comments;
 
+    List<Activity> activities;
+
 }

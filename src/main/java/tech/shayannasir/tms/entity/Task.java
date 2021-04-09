@@ -31,5 +31,7 @@ public class Task extends AuditEntity {
     List<Tag> tags;
     @OneToMany(mappedBy = "task")
     List<Comment> comments;
+    @OneToMany(mappedBy = "task")
+    List<Activity> activities;
 
 }

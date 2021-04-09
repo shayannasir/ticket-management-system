@@ -28,6 +28,7 @@ public class TaskBinder {
         target.setPriority(source.getPriority());
         target.setTags(source.getTags());
         target.setComments(source.getComments());
+        target.setActivities(source.getActivities());
         Optional<User> optionalUser = userRepository.findById(source.getAssignedToID());
         optionalUser.ifPresent(user -> target.setAssignedTo(userDataBinder.bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
         target.setDueDate(source.getDueDate());

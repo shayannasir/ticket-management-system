@@ -49,6 +49,7 @@ public class TicketBinder {
         target.setDescription(source.getDescription());
         target.setTags(source.getTags());
         target.setComments(source.getComments());
+        target.setActivities(source.getActivities());
 
         return target;
     }

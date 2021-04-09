@@ -4,10 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import tech.shayannasir.tms.entity.Comment;
-import tech.shayannasir.tms.entity.Tag;
-import tech.shayannasir.tms.entity.TicketPriority;
-import tech.shayannasir.tms.entity.TicketStatus;
+import tech.shayannasir.tms.entity.*;
 
 import java.util.Date;
 import java.util.List;
@@ -36,6 +33,8 @@ public class TaskResponseDTO {
     List<Tag> tags;
 
     List<Comment> comments;
+
+    List<Activity> activities;
 
     Date dueDate;
 

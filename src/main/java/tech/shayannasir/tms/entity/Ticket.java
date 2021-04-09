@@ -47,4 +47,7 @@ public class Ticket extends AuditEntity {
     @OneToMany(mappedBy = "ticket")
     List<Comment> comments;
 
+    @OneToMany(mappedBy = "ticket")
+    List<Activity> activities;
+
 }
