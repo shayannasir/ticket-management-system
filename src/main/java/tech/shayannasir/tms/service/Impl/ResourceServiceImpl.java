@@ -323,4 +323,32 @@ public class ResourceServiceImpl extends MessageService implements ResourceServi
         }
     }
 
+    public TicketClassification validateClassification(String classification, ResponseDTO responseDTO) {
+        TicketClassification ticketClassification = ticketClassificationRepository.findByValue(classification);
+        if (Objects.isNull(classification))
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_CLASSIFICATION)));
+        return ticketClassification;
+    }
+
+    public TicketPriority validatePriority(String priority, ResponseDTO responseDTO) {
+        TicketPriority ticketPriority = ticketPriorityRepository.findByValue(priority);
+        if (Objects.isNull(priority))
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_PRIORITY)));
+        return ticketPriority;
+    }
+
+    public TicketStatus validateStatus(String status, ResponseDTO responseDTO) {
+        TicketStatus ticketStatus = ticketStatusRepository.findByValue(status);
+        if (Objects.isNull(status))
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_STATUS)));
+        return ticketStatus;
+    }
+
+    public TicketSource validateSource(String source, ResponseDTO responseDTO) {
+        TicketSource ticketSource = ticketSourceRepository.findByValue(source);
+        if (Objects.isNull(source))
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Ticket Source"));
+        return ticketSource;
+    }
+
 }

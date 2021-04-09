@@ -16,5 +16,6 @@ public class UserDetailDTO {
     String email;
     String phoneNumber;
     String role;
+    String department;
 
 }

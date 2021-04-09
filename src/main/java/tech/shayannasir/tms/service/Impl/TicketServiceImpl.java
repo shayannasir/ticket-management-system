@@ -20,6 +20,7 @@ import tech.shayannasir.tms.repository.*;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.ResourceService;
 import tech.shayannasir.tms.service.TicketService;
+import tech.shayannasir.tms.service.UserService;
 
 import java.util.*;
 
@@ -35,6 +36,8 @@ public class TicketServiceImpl extends MessageService implements TicketService {
     @Autowired
     private TicketClassificationRepository ticketClassificationRepository;
     @Autowired
+    private TicketSourceRepository ticketSourceRepository;
+    @Autowired
     private TagRepository tagRepository;
     @Autowired
     private TicketBinder dataBinder;
@@ -42,9 +45,13 @@ public class TicketServiceImpl extends MessageService implements TicketService {
     private ResourceService resourceService;
     @Autowired
     private EndUserRepository endUserRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
-    public ResponseDTO createNewTicket(TicketCreateDTO ticketCreateDTO) {
+    public ResponseDTO createNewTicket(TicketRequestDTO ticketCreateDTO) {
         ResponseDTO responseDTO = new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.INVALID_REQUEST));
 
         validateCreateTicketRequest(ticketCreateDTO, responseDTO);
@@ -52,18 +59,12 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         if (!CollectionUtils.isEmpty(responseDTO.getErrors()))
             return responseDTO;
 
-        TicketStatus status = ticketStatusRepository.findByValue(ticketCreateDTO.getStatus());
-        TicketPriority priority = ticketPriorityRepository.findByValue(ticketCreateDTO.getPriority());
-        TicketClassification classification = ticketClassificationRepository.findByValue(ticketCreateDTO.getClassification());
-
-        if (Objects.isNull(status))
-            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_STATUS)));
-        if (Objects.isNull(priority))
-            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_PRIORITY)));
-        if (Objects.isNull(classification))
-            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_CLASSIFICATION)));
-
+        TicketStatus status = resourceService.validateStatus(ticketCreateDTO.getStatus(), responseDTO);
+        TicketPriority priority = resourceService.validatePriority(ticketCreateDTO.getPriority(), responseDTO);
+        TicketClassification classification = resourceService.validateClassification(ticketCreateDTO.getClassification(), responseDTO);
+        TicketSource source = resourceService.validateSource(ticketCreateDTO.getSource(), responseDTO);
         List<Tag> tags = resourceService.mapTagValueToObjects(ticketCreateDTO.getTags(), responseDTO);
+        User assignedTo = userService.validateUser(ticketCreateDTO.getAssignedTo(), responseDTO);
 
         if (!CollectionUtils.isEmpty(responseDTO.getErrors()))
             return responseDTO;
@@ -75,31 +76,28 @@ public class TicketServiceImpl extends MessageService implements TicketService {
                 responseDTO.setData(existingEndUser);
                 return responseDTO;
             }
-            existingEndUser.setTotalTickets(existingEndUser.getTotalTickets() + 1);
-            existingEndUser.setDueTickets(existingEndUser.getDueTickets() + 1);
         } else {
-            existingEndUser = EndUser.builder()
+            EndUser newEndUser = EndUser.builder()
                     .name(ticketCreateDTO.getContactName())
                     .number(ticketCreateDTO.getMobile())
                     .email(ticketCreateDTO.getEmail())
                     .workID(ticketCreateDTO.getWorkID())
-                    .totalTickets(1L)
-                    .dueTickets(1L)
                     .build();
+
+            existingEndUser = endUserRepository.save(newEndUser);
         }
 
-        EndUser savedEndUser = endUserRepository.save(existingEndUser);
-
-
         Ticket ticket = Ticket.builder()
-                .endUser(savedEndUser)
+                .endUserID(existingEndUser.getId())
                 .subject(ticketCreateDTO.getSubject())
                 .description(ticketCreateDTO.getDescription())
                 .dueDate(ticketCreateDTO.getDueDate())
                 .assignedOn(new Date())
+                .assignedToID(ticketCreateDTO.getAssignedTo())
                 .status(status)
                 .priority(priority)
                 .classification(classification)
+                .ticketSource(source)
                 .tags(tags)
                 .build();
 
@@ -148,19 +146,8 @@ public class TicketServiceImpl extends MessageService implements TicketService {
             ticketResults = ticketPage.getContent();
             resultCount = ticketPage.getTotalPages();
         }
-        ticketResults.stream().forEach(ticket -> {
-            TicketResponseDTO ticketResponseDTO = TicketResponseDTO.builder()
-                    .id(ticket.getId())
-                    .subject(ticket.getSubject())
-                    .status(ticket.getStatus())
-                    .priority(ticket.getPriority())
-                    .classification(ticket.getClassification())
-                    .description(ticket.getDescription())
-                    .tags(ticket.getTags())
-                    .remarkComments(ticket.getRemarkComments())
-                    .resolutionComments(ticket.getResolutionComments())
-                    .build();
-            ticketDTOs.add(ticketResponseDTO);
+        ticketResults.parallelStream().forEach(ticket -> {
+            ticketDTOs.add(dataBinder.bindToDTO(ticket));
         });
 
         DataTableResponseDTO<Object, List<TicketResponseDTO>> responseDTO = DataTableResponseDTO.getInstance(ticketDTOs, resultCount);
@@ -174,36 +161,47 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         Optional<Ticket> existingTicket = ticketRepository.findById(ticketRequestDTO.getId());
 
         if (existingTicket.isPresent()) {
-            TicketStatus status = ticketStatusRepository.findByValue(ticketRequestDTO.getStatus());
-            TicketPriority priority = ticketPriorityRepository.findByValue(ticketRequestDTO.getPriority());
-            TicketClassification classification = ticketClassificationRepository.findByValue(ticketRequestDTO.getClassification());
-
-            if (Objects.isNull(status))
-                responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_STATUS)));
-            if (Objects.isNull(priority))
-                responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_PRIORITY)));
-            if (Objects.isNull(classification))
-                responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.TICKET_INVALID_CLASSIFICATION)));
-
+            TicketStatus status = resourceService.validateStatus(ticketRequestDTO.getStatus(), responseDTO);
+            TicketPriority priority = resourceService.validatePriority(ticketRequestDTO.getPriority(), responseDTO);
+            TicketClassification classification = resourceService.validateClassification(ticketRequestDTO.getClassification(), responseDTO);
+            TicketSource source = resourceService.validateSource(ticketRequestDTO.getSource(), responseDTO);
             List<Tag> tags = resourceService.mapTagValueToObjects(ticketRequestDTO.getTags(), responseDTO);
+            User assignedTo = userService.validateUser(ticketRequestDTO.getAssignedTo(), responseDTO);
 
-            if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
-                responseDTO.setStatus(false);
-                responseDTO.setMessage(getMessage(MessageConstants.INVALID_REQUEST));
+            if (!CollectionUtils.isEmpty(responseDTO.getErrors()))
                 return responseDTO;
+
+            EndUser existingEndUser = endUserRepository.findByEmail(ticketRequestDTO.getEmail());
+            if (Objects.nonNull(existingEndUser)) {
+                if (!isValidEndUserDetails(ticketRequestDTO, existingEndUser)) {
+                    responseDTO.setMessage("Inconsistent End User Details");
+                    responseDTO.setData(existingEndUser);
+                    return responseDTO;
+                }
+            } else {
+                EndUser newEndUser = EndUser.builder()
+                        .name(ticketRequestDTO.getContactName())
+                        .number(ticketRequestDTO.getMobile())
+                        .email(ticketRequestDTO.getEmail())
+                        .workID(ticketRequestDTO.getWorkID())
+                        .build();
+                existingEndUser = endUserRepository.save(newEndUser);
             }
 
             Ticket ticket = existingTicket.get();
-//            ticket.setContactName(ticketRequestDTO.getContactName());
-//            ticket.setEmail(ticketRequestDTO.getEmail());
-//            ticket.setMobile(ticketRequestDTO.getMobile());
-//            ticket.setWorkID(ticketRequestDTO.getWorkID());
+
+            ticket.setEndUserID(existingEndUser.getId());
             ticket.setDescription(ticketRequestDTO.getDescription());
             ticket.setSubject(ticketRequestDTO.getSubject());
             ticket.setStatus(status);
             ticket.setPriority(priority);
             ticket.setClassification(classification);
+            ticket.setTicketSource(source);
             ticket.setTags(tags);
+            if (!ticket.getAssignedToID().equals(ticketRequestDTO.getAssignedTo())) {
+                ticket.setAssignedToID(ticketRequestDTO.getAssignedTo());
+                ticket.setAssignedOn(new Date());
+            }
 
             ticketRepository.save(ticket);
 
@@ -216,7 +214,7 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         return responseDTO;
     }
 
-    private void validateCreateTicketRequest(TicketCreateDTO ticketCreateDTO, ResponseDTO responseDTO) {
+    private void validateCreateTicketRequest(TicketRequestDTO ticketCreateDTO, ResponseDTO responseDTO) {
         if (!ticketCreateDTO.getMobile().matches(Constants.MOBILE_NUMBER_PATTERN))
             responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.INVALID_MOBILE_NUMBER)));
 
@@ -224,10 +222,19 @@ public class TicketServiceImpl extends MessageService implements TicketService {
             responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, getMessage(MessageConstants.INVALID_EMAIL)));
     }
 
-    private Boolean isValidEndUserDetails(TicketCreateDTO source, EndUser target) {
+    private Boolean isValidEndUserDetails(TicketRequestDTO source, EndUser target) {
         return source.getContactName().equals(target.getName())
                 && source.getEmail().equals(target.getEmail())
                 && source.getMobile().equals(target.getNumber())
                 && source.getWorkID().equals(target.getWorkID());
     }
+
+    public Ticket validateTicket(Long ticketID, ResponseDTO responseDTO) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(ticketID);
+        if (optionalTicket.isPresent())
+            return optionalTicket.get();
+        responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Ticket ID"));
+        return null;
+    }
+
 }

@@ -30,8 +30,7 @@ public class Article extends AuditEntity{
     @ManyToMany
     List<Tag> tags;
 
-    @OneToMany
-    @Cascade(CascadeType.ALL)
+    @OneToMany(mappedBy = "article")
     List<Comment> comments;
 
     Long likes;

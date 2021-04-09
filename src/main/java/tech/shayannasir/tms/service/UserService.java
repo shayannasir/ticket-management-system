@@ -3,6 +3,7 @@ package tech.shayannasir.tms.service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import tech.shayannasir.tms.dto.*;
+import tech.shayannasir.tms.entity.User;
 
 import java.util.List;
 
@@ -29,4 +30,6 @@ public interface UserService extends UserDetailsService {
     ResponseDTO forgotUserPassword(ForgotPasswordDTO forgotPasswordDTO);
 
     ResponseDTO resetUserPassword(ResetPasswordDTO resetPasswordDTO);
+
+    User validateUser(Long userID, ResponseDTO responseDTO);
 }

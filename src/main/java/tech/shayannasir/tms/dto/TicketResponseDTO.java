@@ -15,11 +15,10 @@ import java.util.List;
 public class TicketResponseDTO {
 
     Long id;
-    String contactName;
-    String mobile;
-    String email;
-    String workID;
+
     String subject;
+
+    EndUser endUser;
 
     TicketStatus status;
 
@@ -27,11 +26,14 @@ public class TicketResponseDTO {
 
     TicketClassification classification;
 
+    TicketSource source;
+
     String description;
 
     List<Tag> tags;
 
-    List<Comment> remarkComments;
+    UserDetailDTO assignedTo;
 
-    List<Comment> resolutionComments;
+    List<Comment> comments;
+
 }

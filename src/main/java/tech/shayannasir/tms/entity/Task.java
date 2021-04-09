@@ -18,20 +18,18 @@ public class Task extends AuditEntity {
 
     String name;
     Date dueDate;
+    Date assignedOn;
     Long ticketNo;
     String description;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    User assignedTo;
+    Long assignedToID;
     @OneToOne
     TicketPriority priority;
     @OneToOne
     TicketStatus status;
-    @OneToMany
+    @ManyToMany
     List<Tag> tags;
-    @OneToMany
-    List<Comment> resolutionComments;
-    @OneToMany
-    List<Comment> remarkComment;
+    @OneToMany(mappedBy = "task")
+    List<Comment> comments;
 
 }

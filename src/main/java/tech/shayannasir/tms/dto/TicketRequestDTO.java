@@ -10,6 +10,7 @@ import tech.shayannasir.tms.entity.TicketStatus;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -20,8 +21,9 @@ import java.util.List;
 @AllArgsConstructor
 public class TicketRequestDTO {
 
-    @NotNull
     Long id;
+
+    /* End USer Details */
     @NotBlank
     String contactName;
     @NotBlank
@@ -30,16 +32,23 @@ public class TicketRequestDTO {
     String email;
     @NotBlank
     String workID;
+
     @NotBlank
     String subject;
     @NotNull
+    Date dueDate;
+    @NotBlank
     String status;
-    @NotNull
+    @NotBlank
     String priority;
-    @NotNull
+    @NotBlank
     String classification;
     @NotBlank
     String description;
+    @NotBlank
+    String source;
+    @NotNull
+    Long assignedTo;
     @NotEmpty
     List<String> tags;
 }

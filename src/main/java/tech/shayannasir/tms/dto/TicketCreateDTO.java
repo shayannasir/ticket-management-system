@@ -35,12 +35,16 @@ public class TicketCreateDTO {
     String description;
     @NotNull
     Date dueDate;
-    @NotNull
+    @NotBlank
     String status;
-    @NotNull
+    @NotBlank
     String priority;
-    @NotNull
+    @NotBlank
     String classification;
+    @NotBlank
+    String source;
+    @NotNull
+    Long assignedTo;
     @NotEmpty
     List<String> tags;
 

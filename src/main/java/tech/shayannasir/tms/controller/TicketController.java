@@ -14,6 +14,7 @@ import tech.shayannasir.tms.util.ErrorUtil;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/ticket")
@@ -26,7 +27,7 @@ public class TicketController {
     private TicketService ticketService;
 
     @PostMapping("/create")
-    public ResponseDTO createTicket (@Valid @RequestBody TicketCreateDTO ticketCreateDTO, BindingResult bindingResult) {
+    public ResponseDTO createTicket (@Valid @RequestBody TicketRequestDTO ticketCreateDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
         } else
@@ -37,8 +38,11 @@ public class TicketController {
     public ResponseDTO updateTicket(@Valid @RequestBody TicketRequestDTO ticketRequestDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
-        } else
-            return ticketService.editTicketDetails(ticketRequestDTO);
+        } else {
+            if (Objects.nonNull(ticketRequestDTO.getId()))
+                return ticketService.editTicketDetails(ticketRequestDTO);
+            return new ResponseDTO(Boolean.FALSE, "Ticket ID cannot be NULL");
+        }
     }
 
     @GetMapping("/details/{id}")

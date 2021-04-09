@@ -19,9 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Ticket extends AuditEntity {
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "enduser_id")
-    EndUser endUser;
+    Long endUserID;
 
     String subject;
     String description;
@@ -29,9 +27,7 @@ public class Ticket extends AuditEntity {
     Date dueDate;
     Date assignedOn;
 
-    @ManyToOne
-    @JoinColumn(name = "assignedTo_id")
-    User assignedTo;
+    Long assignedToID;
 
     @OneToOne
     TicketStatus status;
@@ -45,13 +41,10 @@ public class Ticket extends AuditEntity {
     @OneToOne
     TicketSource ticketSource;
 
-    @OneToMany
+    @ManyToMany
     List<Tag> tags;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    List<Comment> remarkComments;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    List<Comment> resolutionComments;
+    @OneToMany(mappedBy = "ticket")
+    List<Comment> comments;
 
 }

@@ -18,7 +18,5 @@ public class EndUser extends AuditEntity{
     String email;
     String number;
     String workID;
-    Long totalTickets;
-    Long dueTickets;
 
 }

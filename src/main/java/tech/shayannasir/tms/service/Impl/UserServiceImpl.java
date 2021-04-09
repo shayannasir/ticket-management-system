@@ -32,6 +32,7 @@ import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.UserService;
 import tech.shayannasir.tms.util.JwtUtil;
 
+import javax.jws.soap.SOAPBinding;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 
@@ -281,7 +282,7 @@ public class UserServiceImpl extends MessageService implements UserService {
             userResults = userPage.getContent();
             resultCount = userPage.getTotalElements();
         }
-        userResults.stream().forEach(user -> {
+        userResults.parallelStream().forEach(user -> {
             UserDTO userDTO = UserDTO.builder()
                     .name(user.getName())
                     .id(user.getId())
@@ -377,6 +378,14 @@ public class UserServiceImpl extends MessageService implements UserService {
         }
     }
 
+    public User validateUser(Long userID, ResponseDTO responseDTO) {
+        Optional<User> optionalUser = userRepository.findById(userID);
+        User user = optionalUser.orElse(null);
+        if (Objects.isNull(user))
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid User ID"));
+        return user;
+    }
+
     /*
     * End User Services
     * */
@@ -440,15 +449,13 @@ public class UserServiceImpl extends MessageService implements UserService {
             userResults = userPage.getContent();
             resultCount = userPage.getTotalElements();
         }
-        userResults.stream().forEach(user -> {
+        userResults.parallelStream().forEach(user -> {
             EndUserDTO userDTO = EndUserDTO.builder()
                     .id(user.getId())
                     .name(user.getName())
                     .email(user.getEmail())
                     .number(user.getNumber())
                     .workID(user.getWorkID())
-                    .totalTickets(user.getTotalTickets())
-                    .dueTickets(user.getDueTickets())
                     .build();
             userDTOS.add(userDTO);
         });

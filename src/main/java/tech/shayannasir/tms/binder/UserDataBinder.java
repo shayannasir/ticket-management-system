@@ -50,6 +50,7 @@ public class UserDataBinder {
             target.setEmail(source.getEmail());
             target.setPhoneNumber(source.getPhoneNumber());
             target.setRole(source.getRole().name());
+            target.setDepartment(source.getDepartment().getName());
         }
         return target;
     }
@@ -59,7 +60,7 @@ public class UserDataBinder {
         Optional<User> createdBy = userRepository.findById(createdID);
         createdBy.ifPresent(user -> createdModifiedUserDTO.setCreatedBy(bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
         Optional<User> modifiedBy = userRepository.findById(modifiedID);
-        createdBy.ifPresent(user -> createdModifiedUserDTO.setModifiedBy(bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
+        modifiedBy.ifPresent(user -> createdModifiedUserDTO.setModifiedBy(bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
         return createdModifiedUserDTO;
     }
 

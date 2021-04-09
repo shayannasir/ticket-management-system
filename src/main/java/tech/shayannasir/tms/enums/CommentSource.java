@@ -2,5 +2,6 @@ package tech.shayannasir.tms.enums;
 
 public enum CommentSource {
     TICKET,
-    ARTICLE
+    ARTICLE,
+    TASK
 }
