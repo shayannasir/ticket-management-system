@@ -10,8 +10,6 @@ import tech.shayannasir.tms.enums.ActivityStatus;
 import tech.shayannasir.tms.enums.ActivityType;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter

@@ -48,5 +48,7 @@ public class MessageConstants {
     public static final String NO_STATUS = "no.status";
     public static final String NO_PRIORITY = "no.priority";
     public static final String NO_CLASSIFICATION = "no.classification";
+    public static final String MALICIOUS_FILE_ERROR = "file.error.malicious";
+    public static final String FILE_TYPE_NOT_SUPPORTED = "file.type.not.supported";
 
 }

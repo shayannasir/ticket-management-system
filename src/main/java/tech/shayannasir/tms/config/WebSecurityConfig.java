@@ -34,14 +34,16 @@ import static tech.shayannasir.tms.enums.Role.*;
 @Configuration
 @EnableWebSecurity
 @EnableSwagger2
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class
+WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
             new AntPathRequestMatcher("/noauth/**"),
             new AntPathRequestMatcher("/hello"),
-//            new AntPathRequestMatcher("/user/create"),
 
             new AntPathRequestMatcher("/user/login"),
+            new AntPathRequestMatcher("/file/get/**"),
+
 
             /* Swagger routes */
             new AntPathRequestMatcher("/swagger-ui"),

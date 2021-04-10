@@ -176,4 +176,12 @@ public class TaskServiceImpl extends MessageService implements TaskService {
         responseDTO.setRecordsTotal(ticketRepository.count());
         return responseDTO;
     }
+
+    public Task validateTask(Long taskID, ResponseDTO responseDTO) {
+        Optional<Task> optionalTask = taskRepository.findById(taskID);
+        if (optionalTask.isPresent())
+            return optionalTask.get();
+        responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Task ID"));
+        return null;
+    }
 }

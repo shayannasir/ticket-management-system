@@ -36,6 +36,8 @@ public class TaskResponseDTO {
 
     List<Activity> activities;
 
+    List<Attachment> attachments;
+
     Date dueDate;
 
 

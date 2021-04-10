@@ -4,6 +4,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import tech.shayannasir.tms.entity.*;
 
+import java.text.AttributedCharacterIterator;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -37,5 +39,9 @@ public class TicketResponseDTO {
     List<Comment> comments;
 
     List<Activity> activities;
+
+    List<Attachment> attachments;
+
+    Date dueDate;
 
 }
