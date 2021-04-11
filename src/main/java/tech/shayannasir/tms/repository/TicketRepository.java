@@ -13,4 +13,8 @@ public interface TicketRepository extends CrudRepository<Ticket, Long> {
     List<Ticket> findAll(Sort sort);
     Page<Ticket> findAll(Pageable pageable);
     List<Ticket> findAll();
+
+    List<Ticket> findAllByAssignedToID(Long id, Sort sort);
+    Page<Ticket> findAllByAssignedToID(Long id, Pageable pageable);
+    List<Ticket> findAllByAssignedToID(Long id);
 }

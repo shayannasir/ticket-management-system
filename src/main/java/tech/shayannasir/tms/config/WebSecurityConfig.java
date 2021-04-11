@@ -97,6 +97,14 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/resource/create/**")
                 .hasAuthority(SUPER_ADMIN.name())
 
+                // Ticket creation restricted to SUPER_ADMIN
+                .antMatchers("/ticket/create")
+                .hasAuthority(SUPER_ADMIN.name())
+
+                // Task creation restricted to SUPER_ADMIN
+                .antMatchers("/task/create")
+                .hasAuthority(SUPER_ADMIN.name())
+
                 .antMatchers("/resource/enable")
                 .hasAuthority(SUPER_ADMIN.name())
 

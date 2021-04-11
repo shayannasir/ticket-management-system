@@ -14,4 +14,8 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
     Page<Task> findAll(Pageable pageable);
     List<Task> findAll();
 
+    List<Task> findAllByAssignedToID(Long id, Sort sort);
+    Page<Task> findAllByAssignedToID(Long id, Pageable pageable);
+    List<Task> findAllByAssignedToID(Long id);
+
 }

@@ -16,6 +16,7 @@ import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.entity.*;
 import tech.shayannasir.tms.enums.ErrorCode;
+import tech.shayannasir.tms.enums.Role;
 import tech.shayannasir.tms.repository.*;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.ResourceService;
@@ -125,14 +126,18 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         List<Ticket> ticketResults;
         long resultCount;
         Sort sort = null;
+        boolean isAdmin = false;
+        User currentUser = userService.getCurrentLoggedInUser();
+        if (Objects.nonNull(currentUser) && currentUser.getRole().name().equals(Role.SUPER_ADMIN.name()))
+            isAdmin = true;
         if (StringUtils.isNotBlank(dataTableRequestDTO.getSortColumn())) {
             sort = Sort.by(dataTableRequestDTO.getSortDirection(), dataTableRequestDTO.getSortColumn());
         }
         if (BooleanUtils.isTrue(dataTableRequestDTO.getFetchAllRecords())) {
             if (sort != null)
-                ticketResults = ticketRepository.findAll(sort);
+                ticketResults = isAdmin ? ticketRepository.findAll(sort) : ticketRepository.findAllByAssignedToID(currentUser.getId(), sort);
             else
-                ticketResults = ticketRepository.findAll();
+                ticketResults = isAdmin ? ticketRepository.findAll() : ticketRepository.findAllByAssignedToID(currentUser.getId());
 
             resultCount = ticketResults.size();
         } else {
@@ -142,7 +147,7 @@ public class TicketServiceImpl extends MessageService implements TicketService {
             else
                 pageable = PageRequest.of(dataTableRequestDTO.getPageIndex(), dataTableRequestDTO.getPageSize());
 
-            Page<Ticket> ticketPage = ticketRepository.findAll(pageable);
+            Page<Ticket> ticketPage = isAdmin ? ticketRepository.findAll(pageable) : ticketRepository.findAllByAssignedToID(currentUser.getId(), pageable);
             ticketResults = ticketPage.getContent();
             resultCount = ticketPage.getTotalPages();
         }

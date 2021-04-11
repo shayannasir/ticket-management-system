@@ -32,4 +32,6 @@ public interface UserService extends UserDetailsService {
     ResponseDTO resetUserPassword(ResetPasswordDTO resetPasswordDTO);
 
     User validateUser(Long userID, ResponseDTO responseDTO);
+
+    User getCurrentLoggedInUser();
 }

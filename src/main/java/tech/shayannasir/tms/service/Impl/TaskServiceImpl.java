@@ -16,6 +16,7 @@ import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.entity.*;
 import tech.shayannasir.tms.enums.ErrorCode;
+import tech.shayannasir.tms.enums.Role;
 import tech.shayannasir.tms.repository.*;
 import tech.shayannasir.tms.service.*;
 
@@ -147,14 +148,19 @@ public class TaskServiceImpl extends MessageService implements TaskService {
         List<Task> taskResults;
         long resultCount;
         Sort sort = null;
+        boolean isAdmin = false;
+        User currentUser = userService.getCurrentLoggedInUser();
+        if (Objects.nonNull(currentUser) && currentUser.getRole().name().equals(Role.SUPER_ADMIN.name()))
+            isAdmin = true;
+
         if (StringUtils.isNotBlank(dataTableRequestDTO.getSortColumn())) {
             sort = Sort.by(dataTableRequestDTO.getSortDirection(), dataTableRequestDTO.getSortColumn());
         }
         if (BooleanUtils.isTrue(dataTableRequestDTO.getFetchAllRecords())) {
             if (sort != null)
-                taskResults = taskRepository.findAll(sort);
+                taskResults = isAdmin ? taskRepository.findAll(sort) : taskRepository.findAllByAssignedToID(currentUser.getId(), sort);
             else
-                taskResults = taskRepository.findAll();
+                taskResults = isAdmin ? taskRepository.findAll() : taskRepository.findAllByAssignedToID(currentUser.getId());
 
             resultCount = taskResults.size();
         } else {
@@ -164,7 +170,7 @@ public class TaskServiceImpl extends MessageService implements TaskService {
             else
                 pageable = PageRequest.of(dataTableRequestDTO.getPageIndex(), dataTableRequestDTO.getPageSize());
 
-            Page<Task> taskPage = taskRepository.findAll(pageable);
+            Page<Task> taskPage = isAdmin ? taskRepository.findAll(pageable) : taskRepository.findAllByAssignedToID(currentUser.getId(), pageable);
             taskResults = taskPage.getContent();
             resultCount = taskPage.getTotalPages();
         }
