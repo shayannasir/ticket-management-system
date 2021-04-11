@@ -10,6 +10,7 @@ import tech.shayannasir.tms.enums.ArticleStatus;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.util.List;
 
 @Getter
@@ -32,6 +33,9 @@ public class Article extends AuditEntity{
 
     @OneToMany(mappedBy = "article")
     List<Comment> comments;
+
+    @OneToOne
+    Attachment coverPic;
 
     Long likes;
     Long dislikes;

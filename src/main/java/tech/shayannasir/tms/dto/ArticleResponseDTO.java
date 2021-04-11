@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
+import tech.shayannasir.tms.entity.Attachment;
 import tech.shayannasir.tms.entity.Comment;
 import tech.shayannasir.tms.entity.Tag;
 import tech.shayannasir.tms.entity.User;
@@ -37,5 +38,6 @@ public class ArticleResponseDTO {
     Date lastModifiedDate;
     UserDetailDTO  createdBy;
     UserDetailDTO lastModifiedBy;
+    Attachment coverPic;
 
 }

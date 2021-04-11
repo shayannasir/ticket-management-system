@@ -56,6 +56,7 @@ public class FileManager extends MessageService {
             e.printStackTrace();
             return new ResponseDTO(Boolean.FALSE, "Something went wrong. Please try again");
         }
+        attachmentRepository.save(new Attachment(filename, originalName, multipartFile.getSize()));
         responseDTO.setData(new FileInfo(filename, originalName, multipartFile.getSize()));
         return responseDTO;
     }
@@ -82,6 +83,7 @@ public class FileManager extends MessageService {
             e.printStackTrace();
             return new ResponseDTO(Boolean.FALSE, "Something went wrong. Please try again");
         }
+        attachmentRepository.save(new Attachment(filename, originalName, multipartFile.getSize()));
         responseDTO.setData(new FileInfo(filename, originalName, multipartFile.getSize()));
         return responseDTO;
     }

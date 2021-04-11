@@ -2,6 +2,7 @@ package tech.shayannasir.tms.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import tech.shayannasir.tms.entity.Attachment;
 import tech.shayannasir.tms.entity.Task;
 import tech.shayannasir.tms.enums.Role;
 
@@ -38,6 +39,10 @@ public class UserDTO extends BaseEntityDTO<Long> {
     private String phoneNumber;
     @NotBlank
     private String department;
+
+    private String fileName;
+
+    private Attachment coverPic;
 
     private Long totalTickets;
     private Long dueTickets;

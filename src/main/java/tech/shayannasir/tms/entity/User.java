@@ -34,6 +34,8 @@ public class User extends AuditEntity implements UserDetails {
 
     @OneToOne
     Department department;
+    @OneToOne
+    Attachment coverPic;
 
     Long totalTickets;
     Long dueTickets;

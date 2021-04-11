@@ -35,6 +35,7 @@ public class ArticleBinder {
         target.setLastModifiedDate(source.getLastModifiedDate());
         target.setCreatedBy(createdModifiedUserDTO.getCreatedBy());
         target.setLastModifiedBy(createdModifiedUserDTO.getModifiedBy());
+        target.setCoverPic(source.getCoverPic());
 
         return target;
     }

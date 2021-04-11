@@ -37,6 +37,7 @@ public class UserDataBinder {
         userDTO.setTotalTickets(user.getTotalTickets());
         userDTO.setDueTasks(user.getDueTasks());
         userDTO.setDueTickets(user.getDueTickets());
+        userDTO.setCoverPic(user.getCoverPic());
         return userDTO;
     }
 

@@ -21,16 +21,14 @@ import tech.shayannasir.tms.enums.ArticleInsightAction;
 import tech.shayannasir.tms.enums.ArticleStatus;
 import tech.shayannasir.tms.enums.CommentSource;
 import tech.shayannasir.tms.enums.ErrorCode;
-import tech.shayannasir.tms.repository.ArticleRepository;
-import tech.shayannasir.tms.repository.CommentRepository;
-import tech.shayannasir.tms.repository.TagRepository;
-import tech.shayannasir.tms.repository.UserRepository;
+import tech.shayannasir.tms.repository.*;
 import tech.shayannasir.tms.service.ArticleService;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.ResourceService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -52,6 +50,8 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
     private UserDataBinder userBinder;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AttachmentRepository attachmentRepository;
 
     @Override
     public ResponseDTO createNewArticle(ArticleRequestDTO articleRequestDTO) {
@@ -59,6 +59,9 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
 
         validateCreateArticleRequest(articleRequestDTO, responseDTO);
         List<Tag> tags = resourceService.mapTagValueToObjects(articleRequestDTO.getTags(), responseDTO);
+        Attachment attachment = attachmentRepository.findByName(articleRequestDTO.getFileName());
+        if (Objects.isNull(attachment))
+            responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid File Name"));
 
         if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
             responseDTO.setStatus(Boolean.FALSE);
@@ -71,6 +74,7 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
                 .description(articleRequestDTO.getDescription())
                 .status(articleRequestDTO.getStatus())
                 .tags(tags)
+                .coverPic(attachment)
                 .likes(0L)
                 .dislikes(0L)
                 .views(0L)
@@ -151,7 +155,7 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
             articleResults = articlePage.getContent();
             count = articlePage.getTotalPages();
         }
-        articleResults.stream().forEach(article -> {
+        articleResults.parallelStream().forEach(article -> {
 
             CreatedModifiedUserDTO createdModifiedUserDTO = userBinder.fetchCreatedAndModifiedUsersFor(article.getCreatedBy(), article.getLastModifiedBy());
 
@@ -169,6 +173,7 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
                     .lastModifiedDate(article.getLastModifiedDate())
                     .createdBy(createdModifiedUserDTO.getCreatedBy())
                     .lastModifiedBy(createdModifiedUserDTO.getModifiedBy())
+                    .coverPic(article.getCoverPic())
                     .build();
             articleDTOs.add(articleResponseDTO);
         });
@@ -181,7 +186,8 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
     private void validateCreateArticleRequest(ArticleRequestDTO articleRequestDTO, ResponseDTO responseDTO) {
         responseDTO.hasValue(articleRequestDTO.getTitle(), "Article Title cannot be Empty")
                 .hasValue(articleRequestDTO.getDescription(), "Article Body cannot be Empty")
-                .hasValue(articleRequestDTO.getStatus(), "Article Status cannot be Empty");
+                .hasValue(articleRequestDTO.getStatus(), "Article Status cannot be Empty")
+                .hasValue(articleRequestDTO.getFileName(), "Article Cover cannot be Empty");
 
         if (!EnumUtils.isValidEnum(ArticleStatus.class, articleRequestDTO.getStatus().name()))
             responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Article Status"));

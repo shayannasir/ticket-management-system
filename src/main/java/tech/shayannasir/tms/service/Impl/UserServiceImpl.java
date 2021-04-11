@@ -20,11 +20,13 @@ import tech.shayannasir.tms.binder.UserDataBinder;
 import tech.shayannasir.tms.constants.Constants;
 import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
+import tech.shayannasir.tms.entity.Attachment;
 import tech.shayannasir.tms.entity.Department;
 import tech.shayannasir.tms.entity.EndUser;
 import tech.shayannasir.tms.entity.User;
 import tech.shayannasir.tms.enums.ErrorCode;
 import tech.shayannasir.tms.enums.Role;
+import tech.shayannasir.tms.repository.AttachmentRepository;
 import tech.shayannasir.tms.repository.DepartmentRepository;
 import tech.shayannasir.tms.repository.EndUserRepository;
 import tech.shayannasir.tms.repository.UserRepository;
@@ -52,6 +54,8 @@ public class UserServiceImpl extends MessageService implements UserService {
     private EndUserRepository endUserRepository;
     @Autowired
     private DepartmentRepository departmentRepository;
+    @Autowired
+    private AttachmentRepository attachmentRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -192,6 +196,13 @@ public class UserServiceImpl extends MessageService implements UserService {
                 }
                 user.setPhoneNumber(userDTO.getPhoneNumber());
 
+                if (StringUtils.isNotBlank(userDTO.getFileName())) {
+                    Attachment attachment = attachmentRepository.findByName(userDTO.getFileName());
+                    if (Objects.nonNull(attachment)) {
+                        user.setCoverPic(attachment);
+                    }
+                }
+
                 userRepository.save(user);
 
                 responseDTO.setStatus(true);
@@ -299,6 +310,7 @@ public class UserServiceImpl extends MessageService implements UserService {
                     .role(user.getRole())
                     .empID(user.getEmpID())
                     .createdDate(user.getCreatedDate())
+                    .coverPic(user.getCoverPic())
                     .build();
             userDTOS.add(userDTO);
         });

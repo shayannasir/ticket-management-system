@@ -26,6 +26,9 @@ public class ArticleRequestDTO {
     @NotNull
     ArticleStatus status;
 
+    @NotBlank
+    String fileName;
+
     List<String> tags;
 
     List<Long> comments;
