@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tech.shayannasir.tms.binder.TaskBinder;
 import tech.shayannasir.tms.binder.TicketBinder;
+import tech.shayannasir.tms.constants.Constants;
 import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.entity.*;
@@ -65,6 +66,16 @@ public class TaskServiceImpl extends MessageService implements TaskService {
             return responseDTO;
         }
 
+        if (Objects.nonNull(assignedTo)) {
+            assignedTo.setTotalTasks(assignedTo.getTotalTasks() + 1);
+            if (!status.getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED))
+                assignedTo.setDueTasks(assignedTo.getDueTasks() + 1);
+            userRepository.save(assignedTo);
+        } else {
+            responseDTO.setMessage(getMessage(MessageConstants.INVALID_USER_ID));
+            return responseDTO;
+        }
+
         Task task = Task.builder()
                 .name(taskRequestDTO.getName())
                 .dueDate(taskRequestDTO.getDueDate())
@@ -107,12 +118,33 @@ public class TaskServiceImpl extends MessageService implements TaskService {
 
                 Task task = optionalTask.get();
 
+                if (!task.getAssignedToID().equals(assignedTo.getId())) {
+                    User oldUser = userService.validateUser(task.getAssignedToID(), responseDTO);
+                    oldUser.setTotalTasks(oldUser.getTotalTasks() - 1);
+                    assignedTo.setTotalTasks(assignedTo.getTotalTasks() + 1);
+                    if (!task.getStatus().getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED)) {
+                        oldUser.setDueTasks(oldUser.getDueTasks() - 1);
+                        assignedTo.setDueTasks(assignedTo.getDueTasks() + 1);
+                    }
+                    userRepository.save(oldUser);
+                    userRepository.save(assignedTo);
+                }
+
                 task.setName(taskRequestDTO.getName());
                 task.setDueDate(taskRequestDTO.getDueDate());
                 task.setTicketNo(taskRequestDTO.getTicketNo());
                 task.setDescription(taskRequestDTO.getDescription());
                 task.setAssignedToID(taskRequestDTO.getAssignedTo());
                 task.setPriority(priority);
+
+                if (status.getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED) && !task.getStatus().getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED)) {
+                    assignedTo.setDueTasks(assignedTo.getDueTasks() - 1);
+                    userRepository.save(assignedTo);
+                } else if (!status.getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED) && task.getStatus().getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED)) {
+                    assignedTo.setDueTasks(assignedTo.getDueTasks() + 1);
+                    userRepository.save(assignedTo);
+                }
+
                 task.setStatus(status);
                 task.setTags(tags);
                 if (!task.getAssignedToID().equals(taskRequestDTO.getAssignedTo())) {

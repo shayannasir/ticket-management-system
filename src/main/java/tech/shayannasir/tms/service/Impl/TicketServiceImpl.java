@@ -219,9 +219,11 @@ public class TicketServiceImpl extends MessageService implements TicketService {
             if (!ticket.getAssignedToID().equals(assignedTo.getId())) {
                 User oldUser = userService.validateUser(ticket.getAssignedToID(), responseDTO);
                 oldUser.setTotalTickets(oldUser.getTotalTickets() - 1);
-                oldUser.setDueTickets(oldUser.getDueTickets() - 1);
                 assignedTo.setTotalTickets(assignedTo.getTotalTickets() + 1);
-                assignedTo.setDueTickets(assignedTo.getDueTickets() + 1);
+                if (!ticket.getStatus().getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED)) {
+                    oldUser.setDueTickets(oldUser.getDueTickets() - 1);
+                    assignedTo.setDueTickets(assignedTo.getDueTickets() + 1);
+                }
                 userRepository.save(oldUser);
                 userRepository.save(assignedTo);
             }
