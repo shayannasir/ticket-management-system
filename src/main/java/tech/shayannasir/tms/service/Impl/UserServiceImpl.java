@@ -468,6 +468,8 @@ public class UserServiceImpl extends MessageService implements UserService {
                     .email(user.getEmail())
                     .number(user.getNumber())
                     .workID(user.getWorkID())
+                    .totalTickets(user.getTotalTickets())
+                    .dueTickets(user.getDueTickets())
                     .build();
             userDTOS.add(userDTO);
         });

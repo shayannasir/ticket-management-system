@@ -70,6 +70,16 @@ public class TicketServiceImpl extends MessageService implements TicketService {
         if (!CollectionUtils.isEmpty(responseDTO.getErrors()))
             return responseDTO;
 
+        if (Objects.nonNull(assignedTo)) {
+            assignedTo.setTotalTickets(assignedTo.getTotalTickets() + 1);
+            if (!status.getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED))
+                assignedTo.setDueTickets(assignedTo.getDueTickets() + 1);
+            userRepository.save(assignedTo);
+        } else {
+            responseDTO.setMessage(getMessage(MessageConstants.INVALID_USER_ID));
+            return responseDTO;
+        }
+
         EndUser existingEndUser = endUserRepository.findByEmail(ticketCreateDTO.getEmail());
         if (Objects.nonNull(existingEndUser)) {
             if (!isValidEndUserDetails(ticketCreateDTO, existingEndUser)) {
@@ -77,12 +87,16 @@ public class TicketServiceImpl extends MessageService implements TicketService {
                 responseDTO.setData(existingEndUser);
                 return responseDTO;
             }
+            existingEndUser.setTotalTickets(existingEndUser.getTotalTickets() + 1);
+            existingEndUser.setDueTickets(existingEndUser.getDueTickets() + 1);
         } else {
             EndUser newEndUser = EndUser.builder()
                     .name(ticketCreateDTO.getContactName())
                     .number(ticketCreateDTO.getMobile())
                     .email(ticketCreateDTO.getEmail())
                     .workID(ticketCreateDTO.getWorkID())
+                    .totalTickets(1L)
+                    .dueTickets(1L)
                     .build();
 
             existingEndUser = endUserRepository.save(newEndUser);
@@ -101,6 +115,11 @@ public class TicketServiceImpl extends MessageService implements TicketService {
                 .ticketSource(source)
                 .tags(tags)
                 .build();
+
+        if (status.getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED)) {
+            existingEndUser.setDueTickets(existingEndUser.getDueTickets() - 1);
+            endUserRepository.save(existingEndUser);
+        }
 
         Ticket savedTicket = ticketRepository.save(ticket);
 
@@ -189,15 +208,38 @@ public class TicketServiceImpl extends MessageService implements TicketService {
                         .number(ticketRequestDTO.getMobile())
                         .email(ticketRequestDTO.getEmail())
                         .workID(ticketRequestDTO.getWorkID())
+                        .totalTickets(1L)
+                        .dueTickets(1L)
                         .build();
                 existingEndUser = endUserRepository.save(newEndUser);
             }
 
             Ticket ticket = existingTicket.get();
 
+            if (!ticket.getAssignedToID().equals(assignedTo.getId())) {
+                User oldUser = userService.validateUser(ticket.getAssignedToID(), responseDTO);
+                oldUser.setTotalTickets(oldUser.getTotalTickets() - 1);
+                oldUser.setDueTickets(oldUser.getDueTickets() - 1);
+                assignedTo.setTotalTickets(assignedTo.getTotalTickets() + 1);
+                assignedTo.setDueTickets(assignedTo.getDueTickets() + 1);
+                userRepository.save(oldUser);
+                userRepository.save(assignedTo);
+            }
+
             ticket.setEndUserID(existingEndUser.getId());
             ticket.setDescription(ticketRequestDTO.getDescription());
             ticket.setSubject(ticketRequestDTO.getSubject());
+            if (status.getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED) && !ticket.getStatus().getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED)) {
+                existingEndUser.setDueTickets(existingEndUser.getDueTickets() - 1);
+                endUserRepository.save(existingEndUser);
+                assignedTo.setDueTickets(assignedTo.getDueTickets() - 1);
+                userRepository.save(assignedTo);
+            }else if (!status.getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED) && ticket.getStatus().getValue().equalsIgnoreCase(Constants.TICKET_STATUS_CLOSED)) {
+                existingEndUser.setDueTickets(existingEndUser.getDueTickets() + 1);
+                endUserRepository.save(existingEndUser);
+                assignedTo.setDueTickets(assignedTo.getDueTickets() + 1);
+                userRepository.save(assignedTo);
+            }
             ticket.setStatus(status);
             ticket.setPriority(priority);
             ticket.setClassification(classification);

@@ -36,4 +36,6 @@ public class Constants {
 
     public static final String PASSWORD_INVALID_MESSAGE = "Password should contain at least one uppercase letter, one numeric digit, and one special character. Minimum length should be 8 and maximum 15.";
 
+    public static final String TICKET_STATUS_CLOSED = "closed";
+
 }

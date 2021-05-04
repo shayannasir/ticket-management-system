@@ -19,4 +19,7 @@ public class EndUser extends AuditEntity{
     String number;
     String workID;
 
+    Long totalTickets;
+    Long dueTickets;
+
 }
