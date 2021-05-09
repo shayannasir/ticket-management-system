@@ -78,7 +78,6 @@ public class UserServiceImpl extends MessageService implements UserService {
         }
 
         User userEmail = userRepository.findByEmail(userDTO.getEmailId());
-
         if (Objects.nonNull(userEmail)) {
             responseDTO.setStatus(false);
             responseDTO.setMessage(getMessage(MessageConstants.EMAIL_USERNAME_EXIST));
@@ -86,12 +85,22 @@ public class UserServiceImpl extends MessageService implements UserService {
         }
 
         Department department = departmentRepository.findByValue(userDTO.getDepartment());
-
         if (Objects.isNull(department)) {
             responseDTO.setStatus(false);
             responseDTO.setMessage("Invalid Department");
             return responseDTO;
         }
+
+        Attachment attachment = null;
+        if (StringUtils.isNotBlank(userDTO.getFileName())) {
+            attachment = attachmentRepository.findByName(userDTO.getFileName());
+            if (Objects.isNull(attachment)) {
+                responseDTO.setStatus(false);
+                responseDTO.setMessage("Invalid Cover Picture");
+                return responseDTO;
+            }
+        }
+
 
         User user = User.builder()
                 .username(userDTO.getEmailId())
@@ -102,6 +111,7 @@ public class UserServiceImpl extends MessageService implements UserService {
                 .empID(userDTO.getEmpID())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .department(department)
+                .coverPic(attachment)
                 .totalTasks(0L)
                 .dueTasks(0L)
                 .totalTickets(0L)
@@ -169,6 +179,15 @@ public class UserServiceImpl extends MessageService implements UserService {
             return responseDTO;
         }
 
+        Attachment attachment = null;
+        if (StringUtils.isNotBlank(userDTO.getFileName())) {
+            attachment = attachmentRepository.findByName(userDTO.getFileName());
+            if (Objects.isNull(attachment)) {
+                responseDTO.setMessage("Invalid Cover Picture");
+                return responseDTO;
+            }
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User tokenUser = (User) authentication.getPrincipal();
 
@@ -196,12 +215,8 @@ public class UserServiceImpl extends MessageService implements UserService {
                 }
                 user.setPhoneNumber(userDTO.getPhoneNumber());
 
-                if (StringUtils.isNotBlank(userDTO.getFileName())) {
-                    Attachment attachment = attachmentRepository.findByName(userDTO.getFileName());
-                    if (Objects.nonNull(attachment)) {
-                        user.setCoverPic(attachment);
-                    }
-                }
+                if (Objects.nonNull(attachment))
+                    user.setCoverPic(attachment);
 
                 userRepository.save(user);
 
