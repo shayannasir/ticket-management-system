@@ -48,7 +48,7 @@ public class ArticleController {
     }
 
     @PostMapping("/list")
-    public DataTableResponseDTO<Object, List<ArticleResponseDTO>> getArticleList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
+    public DataTableResponseDTO<Object, List<ArticleSummaryDTO>> getArticleList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
         return articleService.fetchListOfArticles(dataTableRequestDTO);
     }
 

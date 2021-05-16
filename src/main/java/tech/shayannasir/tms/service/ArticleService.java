@@ -8,5 +8,5 @@ public interface ArticleService {
     ResponseDTO createNewArticle(ArticleRequestDTO articleRequestDTO);
     ResponseDTO fetchArticleDetails(Long id);
     ResponseDTO performAction(ArticleInsightRequestDTO requestDTO);
-    DataTableResponseDTO<Object, List<ArticleResponseDTO>> fetchListOfArticles(DataTableRequestDTO dataTableRequestDTO);
+    DataTableResponseDTO<Object, List<ArticleSummaryDTO>> fetchListOfArticles(DataTableRequestDTO dataTableRequestDTO);
 }

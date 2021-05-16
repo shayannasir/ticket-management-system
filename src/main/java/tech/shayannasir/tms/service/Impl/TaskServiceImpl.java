@@ -175,8 +175,8 @@ public class TaskServiceImpl extends MessageService implements TaskService {
     }
 
     @Override
-    public DataTableResponseDTO<Object, List<TaskResponseDTO>> fetchListOfTask(DataTableRequestDTO dataTableRequestDTO) {
-        List<TaskResponseDTO> taskDTOs = new ArrayList<>();
+    public DataTableResponseDTO<Object, List<TaskSummaryDTO>> fetchListOfTask(DataTableRequestDTO dataTableRequestDTO) {
+        List<TaskSummaryDTO> taskDTOs = new ArrayList<>();
         List<Task> taskResults;
         long resultCount;
         Sort sort = null;
@@ -207,10 +207,10 @@ public class TaskServiceImpl extends MessageService implements TaskService {
             resultCount = taskPage.getTotalPages();
         }
         taskResults.parallelStream().forEach(task -> {
-            taskDTOs.add(dataBinder.bindToDTO(task));
+            taskDTOs.add(dataBinder.bindToSummaryDTO(task));
         });
 
-        DataTableResponseDTO<Object, List<TaskResponseDTO>> responseDTO = DataTableResponseDTO.getInstance(taskDTOs, resultCount);
+        DataTableResponseDTO<Object, List<TaskSummaryDTO>> responseDTO = DataTableResponseDTO.getInstance(taskDTOs, resultCount);
         responseDTO.setRecordsTotal(ticketRepository.count());
         return responseDTO;
     }

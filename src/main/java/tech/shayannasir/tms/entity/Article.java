@@ -7,10 +7,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import tech.shayannasir.tms.enums.ArticleStatus;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.List;
 
 @Getter
@@ -24,6 +21,7 @@ import java.util.List;
 public class Article extends AuditEntity{
 
     String title;
+    @Lob
     String description;
 
     ArticleStatus status;

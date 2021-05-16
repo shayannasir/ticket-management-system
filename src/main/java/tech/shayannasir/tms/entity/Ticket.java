@@ -22,6 +22,8 @@ public class Ticket extends AuditEntity {
     Long endUserID;
 
     String subject;
+
+    @Column(columnDefinition = "TEXT")
     String description;
 
     Date dueDate;

@@ -3,6 +3,7 @@ package tech.shayannasir.tms.binder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.shayannasir.tms.dto.TaskResponseDTO;
+import tech.shayannasir.tms.dto.TaskSummaryDTO;
 import tech.shayannasir.tms.entity.Task;
 import tech.shayannasir.tms.entity.User;
 import tech.shayannasir.tms.repository.UserRepository;
@@ -34,6 +35,24 @@ public class TaskBinder {
         optionalUser.ifPresent(user -> target.setAssignedTo(userDataBinder.bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
         target.setDueDate(source.getDueDate());
         target.setTicketNo(source.getTicketNo());
+
+        return target;
+    }
+
+    public TaskSummaryDTO bindToSummaryDTO(Task source) {
+        TaskSummaryDTO target = new TaskSummaryDTO();
+
+        target.setId(source.getId());
+        target.setName(source.getName());
+        target.setDescription(source.getDescription());
+        target.setAssignedOn(source.getAssignedOn());
+        target.setStatus(source.getStatus());
+        target.setPriority(source.getPriority());
+        Optional<User> optionalUser = userRepository.findById(source.getAssignedToID());
+        optionalUser.ifPresent(user -> {
+            target.setAssignedTo(user.getName());
+        });
+        target.setDueDate(source.getDueDate());
 
         return target;
     }

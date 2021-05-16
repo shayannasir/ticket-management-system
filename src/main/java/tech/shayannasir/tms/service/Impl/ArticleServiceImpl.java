@@ -92,7 +92,10 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
 
         Optional<Article> existingArticle = articleRepository.findById(id);
         if (existingArticle.isPresent()) {
-            ArticleResponseDTO articleResponseDTO = dataBinder.bindDocumentToDTO(existingArticle.get());
+            Article article = existingArticle.get();
+            article.setViews(article.getViews() + 1);
+            articleRepository.save(article);
+            ArticleResponseDTO articleResponseDTO = dataBinder.bindDocumentToDTO(article);
             return new ResponseDTO(Boolean.TRUE, getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY), articleResponseDTO);
         }
         return new ResponseDTO(Boolean.FALSE, "No Article found by the provided Article ID");
@@ -129,8 +132,8 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
     }
 
     @Override
-    public DataTableResponseDTO<Object, List<ArticleResponseDTO>> fetchListOfArticles(DataTableRequestDTO dataTableRequestDTO) {
-        List<ArticleResponseDTO> articleDTOs = new ArrayList<>();
+    public DataTableResponseDTO<Object, List<ArticleSummaryDTO>> fetchListOfArticles(DataTableRequestDTO dataTableRequestDTO) {
+        List<ArticleSummaryDTO> articleDTOs = new ArrayList<>();
         List<Article> articleResults;
         long count;
         Sort sort = null;
@@ -157,28 +160,22 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
         }
         articleResults.parallelStream().forEach(article -> {
 
-            CreatedModifiedUserDTO createdModifiedUserDTO = userBinder.fetchCreatedAndModifiedUsersFor(article.getCreatedBy(), article.getLastModifiedBy());
-
-            ArticleResponseDTO articleResponseDTO = ArticleResponseDTO.builder()
+            ArticleSummaryDTO articleResponseDTO = ArticleSummaryDTO.builder()
                     .id(article.getId())
                     .title(article.getTitle())
-                    .description(article.getDescription())
-                    .status(article.getStatus())
-                    .tags(article.getTags())
-                    .comments(article.getComments())
+                    .comments(article.getComments().size())
                     .likes(article.getLikes())
                     .dislikes(article.getDislikes())
                     .views(article.getViews())
                     .createdDate(article.getCreatedDate())
-                    .lastModifiedDate(article.getLastModifiedDate())
-                    .createdBy(createdModifiedUserDTO.getCreatedBy())
-                    .lastModifiedBy(createdModifiedUserDTO.getModifiedBy())
                     .coverPic(article.getCoverPic())
                     .build();
+            Optional<User> createdBy = userRepository.findById(article.getCreatedBy());
+            createdBy.ifPresent(user -> articleResponseDTO.setCreatedBy(user.getName()));
             articleDTOs.add(articleResponseDTO);
         });
 
-        DataTableResponseDTO<Object, List<ArticleResponseDTO>> responseDTO = DataTableResponseDTO.getInstance(articleDTOs, count);
+        DataTableResponseDTO<Object, List<ArticleSummaryDTO>> responseDTO = DataTableResponseDTO.getInstance(articleDTOs, count);
         responseDTO.setRecordsTotal(articleRepository.count());
         return responseDTO;
     }

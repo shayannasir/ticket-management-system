@@ -48,7 +48,7 @@ public class TaskController {
     }
 
     @PostMapping("/list")
-    public DataTableResponseDTO<Object, List<TaskResponseDTO>> getTaskList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
+    public DataTableResponseDTO<Object, List<TaskSummaryDTO>> getTaskList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
         return taskService.fetchListOfTask(dataTableRequestDTO);
     }
 

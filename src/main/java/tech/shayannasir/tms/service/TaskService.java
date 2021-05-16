@@ -9,6 +9,6 @@ public interface TaskService {
     ResponseDTO createNewTask(TaskRequestDTO taskRequestDTO);
     ResponseDTO editTaskDetails(TaskRequestDTO taskRequestDTO);
     ResponseDTO fetchTaskDetails(Long id);
-    DataTableResponseDTO<Object, List<TaskResponseDTO>> fetchListOfTask(DataTableRequestDTO dataTableRequestDTO);
+    DataTableResponseDTO<Object, List<TaskSummaryDTO>> fetchListOfTask(DataTableRequestDTO dataTableRequestDTO);
     Task validateTask(Long taskID, ResponseDTO responseDTO);
 }

@@ -20,6 +20,8 @@ public class Task extends AuditEntity {
     Date dueDate;
     Date assignedOn;
     Long ticketNo;
+
+    @Column(columnDefinition = "text")
     String description;
 
     Long assignedToID;
