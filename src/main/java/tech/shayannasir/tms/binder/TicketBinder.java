@@ -3,6 +3,7 @@ package tech.shayannasir.tms.binder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.shayannasir.tms.dto.TicketResponseDTO;
+import tech.shayannasir.tms.dto.TicketSummaryDTO;
 import tech.shayannasir.tms.entity.EndUser;
 import tech.shayannasir.tms.entity.Ticket;
 import tech.shayannasir.tms.entity.User;
@@ -52,6 +53,20 @@ public class TicketBinder {
         target.setActivities(source.getActivities());
         target.setAttachments(source.getAttachments());
         target.setDueDate(source.getDueDate());
+
+        return target;
+    }
+
+    public TicketSummaryDTO bindToSummaryDTO(Ticket source) {
+        TicketSummaryDTO target = new TicketSummaryDTO();
+
+        target.setId(source.getId());
+        target.setSubject(source.getSubject());
+        target.setStatus(source.getStatus());
+        target.setPriority(source.getPriority());
+        target.setSource(source.getTicketSource());
+        target.setDueDate(source.getDueDate());
+        target.setCreatedDate(source.getCreatedDate());
 
         return target;
     }

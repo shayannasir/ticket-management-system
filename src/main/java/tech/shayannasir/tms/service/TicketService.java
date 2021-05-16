@@ -9,7 +9,7 @@ public interface TicketService {
 
     ResponseDTO createNewTicket(TicketRequestDTO ticketCreateDTO);
     ResponseDTO fetchTicketDetails(Long id);
-    DataTableResponseDTO<Object, List<TicketResponseDTO>> fetchListOfTickets(DataTableRequestDTO dataTableRequestDTO);
+    DataTableResponseDTO<Object, List<TicketSummaryDTO>> fetchListOfTickets(DataTableRequestDTO dataTableRequestDTO);
     ResponseDTO editTicketDetails(TicketRequestDTO ticketRequestDTO);
 
     Ticket validateTicket(Long ticketID, ResponseDTO responseDTO);

@@ -140,8 +140,8 @@ public class TicketServiceImpl extends MessageService implements TicketService {
     }
 
     @Override
-    public DataTableResponseDTO<Object, List<TicketResponseDTO>> fetchListOfTickets(DataTableRequestDTO dataTableRequestDTO) {
-        List<TicketResponseDTO> ticketDTOs = new ArrayList<>();
+    public DataTableResponseDTO<Object, List<TicketSummaryDTO>> fetchListOfTickets(DataTableRequestDTO dataTableRequestDTO) {
+        List<TicketSummaryDTO> ticketDTOs = new ArrayList<>();
         List<Ticket> ticketResults;
         long resultCount;
         Sort sort = null;
@@ -171,10 +171,10 @@ public class TicketServiceImpl extends MessageService implements TicketService {
             resultCount = ticketPage.getTotalPages();
         }
         ticketResults.parallelStream().forEach(ticket -> {
-            ticketDTOs.add(dataBinder.bindToDTO(ticket));
+            ticketDTOs.add(dataBinder.bindToSummaryDTO(ticket));
         });
 
-        DataTableResponseDTO<Object, List<TicketResponseDTO>> responseDTO = DataTableResponseDTO.getInstance(ticketDTOs, resultCount);
+        DataTableResponseDTO<Object, List<TicketSummaryDTO>> responseDTO = DataTableResponseDTO.getInstance(ticketDTOs, resultCount);
         responseDTO.setRecordsTotal(ticketRepository.count());
         return responseDTO;
     }

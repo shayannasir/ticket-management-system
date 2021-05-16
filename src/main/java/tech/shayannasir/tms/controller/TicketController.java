@@ -56,7 +56,7 @@ public class TicketController {
     }
 
     @PostMapping("/list")
-    public DataTableResponseDTO<Object, List<TicketResponseDTO>> getTicketList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
+    public DataTableResponseDTO<Object, List<TicketSummaryDTO>> getTicketList(@RequestBody DataTableRequestDTO dataTableRequestDTO) {
         return ticketService.fetchListOfTickets(dataTableRequestDTO);
     }
 
