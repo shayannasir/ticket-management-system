@@ -26,6 +26,7 @@ public class UserDataBinder {
         userDTO.setUsername(user.getUsername());
         userDTO.setName(user.getName());
         userDTO.setEmailId(user.getEmail());
+        userDTO.setEmpID(user.getEmpID());
         userDTO.setPhoneNumber(user.getPhoneNumber());
         userDTO.setRole(user.getRole());
         userDTO.setAccountEnabled(user.getAccountEnabled());
