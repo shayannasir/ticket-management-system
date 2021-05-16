@@ -42,6 +42,7 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
             new AntPathRequestMatcher("/hello"),
 
             new AntPathRequestMatcher("/user/login"),
+            new AntPathRequestMatcher("/user/list"),
             new AntPathRequestMatcher("/file/get/**"),
 
 
