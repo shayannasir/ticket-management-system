@@ -65,4 +65,13 @@ public class ArticleController {
         return articleService.fetchListOfArticles(dataTableRequestDTO);
     }
 
+    @GetMapping("/actions")
+    public ResponseDTO getActions(@RequestParam("article") String article) {
+        try {
+            Long articleID = Long.parseLong(article);
+            return articleService.fetchActions(articleID);
+        } catch (NumberFormatException nfe) {
+            return new ResponseDTO(Boolean.FALSE, "Invalid article/user ID");
+        }
+    }
 }

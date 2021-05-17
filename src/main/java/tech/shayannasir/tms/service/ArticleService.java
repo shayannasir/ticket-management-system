@@ -12,5 +12,5 @@ public interface ArticleService {
     DataTableResponseDTO<Object, List<ArticleSummaryDTO>> fetchListOfArticles(DataTableRequestDTO dataTableRequestDTO);
     ResponseDTO editArticle(ArticleRequestDTO articleRequestDTO);
     Article validateArticle(Long articleID, ResponseDTO responseDTO);
-
+    ResponseDTO fetchActions(Long articleID);
 }

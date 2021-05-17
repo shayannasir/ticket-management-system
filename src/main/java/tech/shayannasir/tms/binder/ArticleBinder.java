@@ -2,9 +2,11 @@ package tech.shayannasir.tms.binder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.shayannasir.tms.dto.ArticleActionResponseDTO;
 import tech.shayannasir.tms.dto.ArticleResponseDTO;
 import tech.shayannasir.tms.dto.CreatedModifiedUserDTO;
 import tech.shayannasir.tms.entity.Article;
+import tech.shayannasir.tms.entity.ArticleAction;
 import tech.shayannasir.tms.entity.User;
 import tech.shayannasir.tms.repository.UserRepository;
 
@@ -28,8 +30,6 @@ public class ArticleBinder {
         target.setStatus(source.getStatus());
         target.setTags(source.getTags());
         target.setComments(source.getComments());
-        target.setLikes(source.getLikes());
-        target.setDislikes(source.getDislikes());
         target.setViews(source.getViews());
         target.setCreatedDate(source.getCreatedDate());
         target.setLastModifiedDate(source.getLastModifiedDate());
@@ -39,6 +39,14 @@ public class ArticleBinder {
         target.setAttachments(source.getAttachments());
 
         return target;
+    }
+
+    public ArticleActionResponseDTO bindToActionDTO(ArticleAction articleAction) {
+        return new ArticleActionResponseDTO(
+                articleAction.getUserID(),
+                articleAction.getIsLiked(),
+                articleAction.getArticleID()
+        );
     }
 
 }

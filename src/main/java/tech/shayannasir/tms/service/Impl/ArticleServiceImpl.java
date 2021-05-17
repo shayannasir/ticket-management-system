@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImpl extends MessageService implements ArticleService {
@@ -44,6 +45,8 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
     private AttachmentRepository attachmentRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ArticleActionRepository articleActionRepository;
 
     @Override
     public ResponseDTO createNewArticle(ArticleRequestDTO articleRequestDTO) {
@@ -67,8 +70,6 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
                 .status(articleRequestDTO.getStatus())
                 .tags(tags)
                 .coverPic(attachment)
-                .likes(0L)
-                .dislikes(0L)
                 .views(0L)
                 .build();
 
@@ -101,18 +102,26 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
             Article article = existingArticle.get();
             try {
                 ArticleInsightAction action = ArticleInsightAction.valueOf(requestDTO.getActionType().name());
+                Boolean isLiked = null;
                 switch (action) {
                     case LIKE:
-                        article.setLikes(article.getLikes() + 1);
+                        isLiked = true;
                         break;
                     case DISLIKE:
-                        article.setDislikes(article.getDislikes() + 1);
-                        break;
-                    case VIEW:
-                        article.setViews(article.getViews() + 1);
+                        isLiked = false;
                         break;
                 }
-                articleRepository.save(article);
+                User loggedIn = userService.getCurrentLoggedInUser();
+                ArticleAction articleAction = articleActionRepository.findByArticleIDAndUserID(article.getId(), loggedIn.getId());
+                if (Objects.isNull(articleAction)) {
+                    articleAction = new ArticleAction();
+                    articleAction.setArticleID(article.getId());
+                    articleAction.setUserID(loggedIn.getId());
+                }
+                if (Objects.nonNull(articleAction.getIsLiked()) && articleAction.getIsLiked().equals(isLiked))
+                    return new ResponseDTO(Boolean.FALSE, "You have already " + requestDTO.getActionType().name() + "D" +  " the Article");
+                articleAction.setIsLiked(isLiked);
+                articleActionRepository.save(articleAction);
                 responseDTO.setStatus(Boolean.TRUE);
                 responseDTO.setMessage(getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY));
             } catch (Exception e) {
@@ -156,8 +165,8 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
                     .id(article.getId())
                     .title(article.getTitle())
                     .comments(article.getComments().size())
-                    .likes(article.getLikes())
-                    .dislikes(article.getDislikes())
+//                    .likes(article.getLikes())
+//                    .dislikes(article.getDislikes())
                     .views(article.getViews())
                     .createdDate(article.getCreatedDate())
                     .coverPic(article.getCoverPic())
@@ -227,5 +236,20 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
             return optionalArticle.get();
         responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Article ID"));
         return null;
+    }
+
+    @Override
+    public ResponseDTO fetchActions(Long articleID) {
+        ResponseDTO responseDTO = new ResponseDTO(Boolean.TRUE, getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY));
+        List<ArticleAction> articleActions = articleActionRepository.findAllByArticleID(articleID);
+        if (!CollectionUtils.isEmpty(articleActions)){
+            responseDTO.setData(
+                    articleActions.parallelStream()
+                            .map(articleAction -> dataBinder.bindToActionDTO(articleAction))
+                            .collect(Collectors.toList())
+            );
+            return responseDTO;
+        }
+        return new ResponseDTO(Boolean.TRUE, "No Actions found for the provided article");
     }
 }

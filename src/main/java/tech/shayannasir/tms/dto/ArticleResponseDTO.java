@@ -30,8 +30,7 @@ public class ArticleResponseDTO {
     ArticleStatus status;
     List<Tag> tags;
     List<Comment> comments;
-    Long likes;
-    Long dislikes;
+
     Long views;
 
     Date createdDate;

@@ -38,8 +38,6 @@ public class Article extends AuditEntity{
     @OneToMany(mappedBy = "article")
     List<Attachment> attachments;
 
-    Long likes;
-    Long dislikes;
     Long views;
 
 }
