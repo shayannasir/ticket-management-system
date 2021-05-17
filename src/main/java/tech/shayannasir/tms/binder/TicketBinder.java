@@ -60,6 +60,8 @@ public class TicketBinder {
     public TicketSummaryDTO bindToSummaryDTO(Ticket source) {
         TicketSummaryDTO target = new TicketSummaryDTO();
 
+        Optional<User> optionalUser = userRepository.findById(source.getAssignedToID());
+        optionalUser.ifPresent(user -> target.setAssignedTo(userDataBinder.bindDocumentToDetailDTO(Optional.of(user).orElse(null))));
         target.setId(source.getId());
         target.setSubject(source.getSubject());
         target.setStatus(source.getStatus());

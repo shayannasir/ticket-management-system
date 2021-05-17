@@ -16,4 +16,5 @@ public class TicketSummaryDTO {
     TicketSource source;
     Date dueDate;
     Date createdDate;
+    UserDetailDTO assignedTo;
 }
