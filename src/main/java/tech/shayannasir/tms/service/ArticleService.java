@@ -9,4 +9,5 @@ public interface ArticleService {
     ResponseDTO fetchArticleDetails(Long id);
     ResponseDTO performAction(ArticleInsightRequestDTO requestDTO);
     DataTableResponseDTO<Object, List<ArticleSummaryDTO>> fetchListOfArticles(DataTableRequestDTO dataTableRequestDTO);
+    ResponseDTO editArticle(ArticleRequestDTO articleRequestDTO);
 }

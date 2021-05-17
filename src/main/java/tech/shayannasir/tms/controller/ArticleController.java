@@ -12,6 +12,7 @@ import tech.shayannasir.tms.util.ErrorUtil;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/article")
@@ -37,6 +38,18 @@ public class ArticleController {
         } catch (NumberFormatException nfe) {
             return new ResponseDTO(Boolean.FALSE, "Invalid Article ID");
         }
+    }
+
+    @PostMapping("/update")
+    public ResponseDTO updateArticle(@Valid @RequestBody ArticleRequestDTO articleRequestDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ErrorUtil.bindErrorResponse(ErrorCode.VALIDATION_ERROR, bindingResult);
+        } else {
+            if (Objects.nonNull(articleRequestDTO.getId()))
+                return articleService.editArticle(articleRequestDTO);
+            return new ResponseDTO(Boolean.FALSE, "Article ID cannot be NULL");
+        }
+
     }
 
     @PostMapping("/action")

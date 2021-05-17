@@ -17,14 +17,12 @@ import tech.shayannasir.tms.binder.UserDataBinder;
 import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.*;
 import tech.shayannasir.tms.entity.*;
-import tech.shayannasir.tms.enums.ArticleInsightAction;
-import tech.shayannasir.tms.enums.ArticleStatus;
-import tech.shayannasir.tms.enums.CommentSource;
-import tech.shayannasir.tms.enums.ErrorCode;
+import tech.shayannasir.tms.enums.*;
 import tech.shayannasir.tms.repository.*;
 import tech.shayannasir.tms.service.ArticleService;
 import tech.shayannasir.tms.service.MessageService;
 import tech.shayannasir.tms.service.ResourceService;
+import tech.shayannasir.tms.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,19 +37,13 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
     @Autowired
     private ResourceService resourceService;
     @Autowired
-    private TagRepository tagRepository;
-    @Autowired
     private ArticleBinder dataBinder;
-    @Autowired
-    private CommentBinder commentBinder;
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private UserDataBinder userBinder;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private AttachmentRepository attachmentRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     public ResponseDTO createNewArticle(ArticleRequestDTO articleRequestDTO) {
@@ -178,6 +170,44 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
         DataTableResponseDTO<Object, List<ArticleSummaryDTO>> responseDTO = DataTableResponseDTO.getInstance(articleDTOs, count);
         responseDTO.setRecordsTotal(articleRepository.count());
         return responseDTO;
+    }
+
+    @Override
+    public ResponseDTO editArticle(ArticleRequestDTO articleRequestDTO) {
+        ResponseDTO responseDTO = new ResponseDTO(Boolean.TRUE, "Article updated successfully");
+        Optional<Article> existing = articleRepository.findById(articleRequestDTO.getId());
+
+        if (existing.isPresent()) {
+            Article article = existing.get();
+            User loggedInUser = userService.getCurrentLoggedInUser();
+
+            if (article.getCreatedBy().equals(loggedInUser.getId()) || loggedInUser.getRole().name().equals(Role.SUPER_ADMIN.name())) {
+                validateCreateArticleRequest(articleRequestDTO, responseDTO);
+                List<Tag> tags = resourceService.mapTagValueToObjects(articleRequestDTO.getTags(), responseDTO);
+                Attachment attachment = attachmentRepository.findByName(articleRequestDTO.getFileName());
+                if (Objects.isNull(attachment))
+                    responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid File Name"));
+
+                if (!CollectionUtils.isEmpty(responseDTO.getErrors())) {
+                    responseDTO.setStatus(Boolean.FALSE);
+                    responseDTO.setMessage(getMessage(MessageConstants.INVALID_REQUEST));
+                    return responseDTO;
+                }
+
+                article.setTitle(articleRequestDTO.getTitle());
+                article.setDescription(articleRequestDTO.getDescription());
+                article.setStatus(articleRequestDTO.getStatus());
+                article.setTags(tags);
+                article.setCoverPic(attachment);
+
+                articleRepository.save(article);
+                responseDTO.setData(article);
+                return responseDTO;
+            }
+            return new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.OPERATION_NOT_PERMITTED));
+        }
+
+        return new ResponseDTO(Boolean.FALSE, "Article with the given ID not found");
     }
 
     private void validateCreateArticleRequest(ArticleRequestDTO articleRequestDTO, ResponseDTO responseDTO) {
