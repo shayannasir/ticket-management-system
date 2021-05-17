@@ -29,6 +29,12 @@ public class Attachment extends AuditEntity {
     @JsonIgnore
     Ticket ticket;
 
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_id")
+    @JsonIgnore
+    Article article;
+
     public Attachment(String name, String originalName, Long sizeInBytes) {
         this.name = name;
         this.originalName = originalName;
@@ -47,5 +53,12 @@ public class Attachment extends AuditEntity {
         this.originalName = originalName;
         this.sizeInBytes = sizeInBytes;
         this.ticket = ticket;
+    }
+
+    public Attachment(String name, String originalName, Long sizeInBytes, Article article) {
+        this.name = name;
+        this.originalName = originalName;
+        this.sizeInBytes = sizeInBytes;
+        this.article = article;
     }
 }

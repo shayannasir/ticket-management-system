@@ -167,6 +167,44 @@ public class FileUploadController {
         }
     }
 
+    @PostMapping("/upload/article/attachment")
+    public ResponseDTO uploadArticleAttachment(@RequestParam("file") MultipartFile file, @RequestParam("type") FileUploadType type, @RequestParam("id") String id) throws IOException, ValidationException {
+        try {
+            Long ID = Long.parseLong(id.trim());
+            switch (type) {
+                case IMAGE:
+                    if (!isValidImage(file)) {
+                        return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.FILE_TYPE_NOT_SUPPORTED));
+                    }
+                    break;
+                case DOCUMENT:
+                    if (!isValidDoc(file)) {
+                        return new ResponseDTO(Boolean.FALSE, messageService.getMessage(MessageConstants.FILE_TYPE_NOT_SUPPORTED));
+                    }
+                    break;
+            }
+            if (file.isEmpty())
+                return new ResponseDTO(Boolean.FALSE, "File cannot be empty");
+            return fileManager.saveArticleAttachment(file, ID);
+        } catch (NumberFormatException nfe) {
+            return new ResponseDTO(Boolean.FALSE, "Invalid Article ID");
+        }
+    }
+
+    @GetMapping("/get/article/attachment")
+    public void fetchArticleAttachment(@RequestParam("fileName") String fileName, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            InputStream inputStream = fileManager.getArticleAttachment(fileName);
+            response.setContentType("application/octet-stream");
+            response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+            IOUtils.copy(inputStream, response.getOutputStream());
+            response.getOutputStream().flush();
+            inputStream.close();
+        } catch (IOException e) {
+            e.getMessage();
+        }
+    }
+
     public static String detectMimeType(final MultipartFile file) throws IOException {
         TikaInputStream tikaIS = null;
         try {

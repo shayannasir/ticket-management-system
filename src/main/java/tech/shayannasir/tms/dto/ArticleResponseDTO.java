@@ -39,5 +39,6 @@ public class ArticleResponseDTO {
     UserDetailDTO  createdBy;
     UserDetailDTO lastModifiedBy;
     Attachment coverPic;
+    List<Attachment> attachments;
 
 }

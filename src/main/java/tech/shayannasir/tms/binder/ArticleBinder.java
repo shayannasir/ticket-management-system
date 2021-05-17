@@ -36,6 +36,7 @@ public class ArticleBinder {
         target.setCreatedBy(createdModifiedUserDTO.getCreatedBy());
         target.setLastModifiedBy(createdModifiedUserDTO.getModifiedBy());
         target.setCoverPic(source.getCoverPic());
+        target.setAttachments(source.getAttachments());
 
         return target;
     }

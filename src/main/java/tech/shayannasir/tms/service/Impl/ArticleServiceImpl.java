@@ -219,4 +219,13 @@ public class ArticleServiceImpl extends MessageService implements ArticleService
         if (!EnumUtils.isValidEnum(ArticleStatus.class, articleRequestDTO.getStatus().name()))
             responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Article Status"));
     }
+
+    @Override
+    public Article validateArticle(Long articleID, ResponseDTO responseDTO) {
+        Optional<Article> optionalArticle = articleRepository.findById(articleID);
+        if (optionalArticle.isPresent())
+            return optionalArticle.get();
+        responseDTO.addToErrors(new ErrorDTO(ErrorCode.VALIDATION_ERROR, "Invalid Article ID"));
+        return null;
+    }
 }

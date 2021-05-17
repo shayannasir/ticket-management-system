@@ -35,6 +35,9 @@ public class Article extends AuditEntity{
     @OneToOne
     Attachment coverPic;
 
+    @OneToMany(mappedBy = "article")
+    List<Attachment> attachments;
+
     Long likes;
     Long dislikes;
     Long views;

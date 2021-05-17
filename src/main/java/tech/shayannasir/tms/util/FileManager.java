@@ -14,10 +14,7 @@ import tech.shayannasir.tms.constants.MessageConstants;
 import tech.shayannasir.tms.dto.ResponseDTO;
 import tech.shayannasir.tms.entity.*;
 import tech.shayannasir.tms.repository.AttachmentRepository;
-import tech.shayannasir.tms.service.MessageService;
-import tech.shayannasir.tms.service.TaskService;
-import tech.shayannasir.tms.service.TicketService;
-import tech.shayannasir.tms.service.UserService;
+import tech.shayannasir.tms.service.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,6 +40,8 @@ public class FileManager extends MessageService {
     private AttachmentBinder attachmentBinder;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private ArticleService articleService;
 
     public ResponseDTO saveUserCover(MultipartFile multipartFile) {
         ResponseDTO responseDTO = new ResponseDTO(Boolean.TRUE, getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY));
@@ -177,5 +176,42 @@ public class FileManager extends MessageService {
 
     private String getExtension(String filename) {
         return FilenameUtils.getExtension(filename);
+    }
+
+    public ResponseDTO saveArticleAttachment(MultipartFile file, Long id) {
+        ResponseDTO responseDTO = new ResponseDTO(Boolean.FALSE, getMessage(MessageConstants.INVALID_REQUEST));
+
+        if (Objects.nonNull(id)) {
+            Article article = articleService.validateArticle(id, responseDTO);
+            if (!CollectionUtils.isEmpty(responseDTO.getErrors()))
+                return responseDTO;
+
+            String originalName = file.getOriginalFilename();
+            String filename = generateRandomUUID() + "." + getExtension(originalName);
+            Path path = Paths.get(basePath + "article/" + filename);
+            try {
+                Files.createDirectories(path);
+                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new ResponseDTO(Boolean.FALSE, "Something went wrong. Please try again");
+            }
+
+            attachmentRepository.save(new Attachment(filename, originalName, file.getSize(), article));
+            responseDTO.setStatus(Boolean.TRUE);
+            responseDTO.setMessage(getMessage(MessageConstants.REQUEST_PROCESSED_SUCCESSFULLY));
+            responseDTO.setData(new FileInfo(filename, originalName, file.getSize()));
+        }
+        return responseDTO;
+    }
+
+    public InputStream getArticleAttachment(String fileName) {
+        try {
+            File file = new File(basePath + "article/" + fileName);
+            return FileUtils.openInputStream(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File Not Found", e);
+        }
     }
 }
